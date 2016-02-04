@@ -1,6 +1,13 @@
 package org.usfirst.frc.team6166.robot;
 
 import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+
+import com.ni.vision.NIVision;
+import com.ni.vision.NIVision.DrawMode;
+import com.ni.vision.NIVision.Image;
+import com.ni.vision.NIVision.ShapeMode;
+
+import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
@@ -46,6 +53,8 @@ public class Robot extends IterativeRobot {
 	Joystick leftStick;// = new Joystick(1);
 	int n;
 	int autoLoopCounter;
+	int session;
+    Image frame;
 	/*
 	 * ENCODERS
 	 * 
@@ -113,12 +122,21 @@ public class Robot extends IterativeRobot {
     	chassis.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
     	//chassis.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
     	chassis.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);    	    	
-    	/*Don't delete after this*/    	
+    	/*Don't delete after this*/
+    	
+    	//vision
+        frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+        // the camera name (ex "cam0") can be found through the roborio web interface
+        session = NIVision.IMAQdxOpenCamera("cam0",
+                NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+        NIVision.IMAQdxConfigureGrab(session);
     }   
     
     /**
      * This function is run once each time the robot enters autonomous mode
      */
+	
+	
 	
     public void autonomousInit() {
     	
@@ -152,6 +170,19 @@ public class Robot extends IterativeRobot {
      */
     @SuppressWarnings("deprecation")
 	public void teleopPeriodic() {
+    	NIVision.IMAQdxStartAcquisition(session);
+
+        /**
+         * grab an image, draw the circle, and provide it for the camera server
+         * which will in turn send it to the dashboard.
+         */
+        NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+         while (isOperatorControl() && isEnabled()) {
+        	 NIVision.IMAQdxGrab(session, frame, 1);
+        	 /*NIVision.imaqDrawShapeOnImage(frame, frame, rect,
+        			 DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);*/
+                
+        	 CameraServer.getInstance().setImage(frame);            
     	
     	//Display to dashboard
     	SmartDashboard.putBoolean("Right Stick - Button 1", rightStick.getRawButton(1));
@@ -168,7 +199,7 @@ public class Robot extends IterativeRobot {
     	//arcade drive:
         chassis.arcadeDrive(rightStick);
         
-        //data to dashboard
+        //data to dash board
         SmartDashboard.putNumber("Chassis", autoLoopCounter);
         
         //buttons
@@ -206,7 +237,8 @@ public class Robot extends IterativeRobot {
         		chassis.tankDrive(stick, stick2);
             	Timer.delay(0.005);		// wait for a motor update time
         	}*/
-        
+         }         
+         NIVision.IMAQdxStopAcquisition(session);        
     }
     
     /**
