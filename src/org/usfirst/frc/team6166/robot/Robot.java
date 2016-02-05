@@ -41,7 +41,7 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
  * 
  * 4: front height - Victor motor controller
  * 
- * @return 5: front tilt - Victor motor controller
+ * 5: front tilt - Victor motor controller
  * 
  */
 
