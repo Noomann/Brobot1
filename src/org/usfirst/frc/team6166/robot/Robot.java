@@ -33,14 +33,15 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
 /**
  * MOTOR PORT INFORMATION
  * 
- * 0: right front - Spark motor controller
- * 1: right rear - Spark motor controller
+ * 0: right front - Spark motor controller - RED
+ * 1: right rear - Spark motor controller - RED
  * 
- * 2: left front - Spark motor controller
- * 3: left rear - Spark motor controller
+ * 2: left front - Spark motor controller - BLACK
+ * 3: left rear - Spark motor controller - BLACK
  * 
  * 4: front height - Victor motor controller
- * 5: front tilt - Victor motor controller
+ * 
+ * @return 5: front tilt - Victor motor controller
  * 
  */
 
@@ -166,7 +167,13 @@ public class Robot extends IterativeRobot {
     }
 
     /**
+     * 
      * This function is called periodically during operator control
+     * @see edu.wpi.first.wpilibj.IterativeRobot#teleopPeriodic()
+     * @param
+     * @author Holmen Robotics
+     * @version 2/5/2016
+     *   
      */
     @SuppressWarnings("deprecation")
 	public void teleopPeriodic() {
@@ -174,7 +181,7 @@ public class Robot extends IterativeRobot {
 
         /**
          * grab an image, draw the circle, and provide it for the camera server
-         * which will in turn send it to the dashboard.
+         * which will in turn send it to the dash board.
          */
         NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
          while (isOperatorControl() && isEnabled()) {
@@ -184,7 +191,7 @@ public class Robot extends IterativeRobot {
                 
         	 CameraServer.getInstance().setImage(frame);            
     	
-    	//Display to dashboard
+    	//Display to dash board
     	SmartDashboard.putBoolean("Right Stick - Button 1", rightStick.getRawButton(1));
     	SmartDashboard.putBoolean("Right Stick - Button 2", rightStick.getRawButton(2));
     	SmartDashboard.putBoolean("Right Stick - Button 3", rightStick.getRawButton(3));
@@ -199,6 +206,12 @@ public class Robot extends IterativeRobot {
     	//arcade drive:
         chassis.arcadeDrive(rightStick);
         
+        //tank drive:
+        chassis.setSafetyEnabled(true);        
+    	while (isOperatorControl() && isEnabled()) {
+    		chassis.tankDrive(rightStick, leftStick);
+        	Timer.delay(0.005);		// wait for a motor update time
+    	}         
         //data to dash board
         SmartDashboard.putNumber("Chassis", autoLoopCounter);
         
@@ -230,14 +243,7 @@ public class Robot extends IterativeRobot {
         
         //controlArmHeight.drive(rightStick.getRawAxis(2), 0.0);
         //controlArmTilt.drive(rightStick.getRawAxis(2), 0.0);
-               
-        /*Tank Drive:
-         * chassis.setSafetyEnabled(true);
-        	while (isOperatorControl() && isEnabled()) {
-        		chassis.tankDrive(stick, stick2);
-            	Timer.delay(0.005);		// wait for a motor update time
-        	}*/
-         }         
+         }
          NIVision.IMAQdxStopAcquisition(session);        
     }
     
