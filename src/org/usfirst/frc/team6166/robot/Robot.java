@@ -94,10 +94,14 @@ public class Robot extends IterativeRobot {
 	  * ai = new AnalogInput(0);
 	  * 
 	  */
-		
-	Spark rearLeft = new Spark(3);		// Left Rear
-	Spark rearRight = new Spark(1);		// Right Rear
+    
+    //chassis controller 
+    Spark frontRight = new Spark(0);	// Right Front
+    Spark rearRight = new Spark(1);		// Right Rear
+    Spark frontLeft = new Spark(2);		// Left Front
+	Spark rearLeft = new Spark(3);		// Left Rear			
 	
+	//arm motors
 	Victor armHeight = new Victor(4);	// Arm Height
 	Victor armTilt = new Victor(5);		// Arm Tilt
 	
