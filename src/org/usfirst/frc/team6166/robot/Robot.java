@@ -40,13 +40,11 @@ import edu.wpi.first.wpilibj.buttons.JoystickButton;
  * 3: left rear - Spark motor controller - BLACK
  * 
  * 4: front height - Victor motor controller
- * 
  * 5: front tilt - Victor motor controller
  * 
  */
 
 public class Robot extends IterativeRobot {
-	//public static OI oi;
 	RobotDrive chassis;// = new RobotDrive(0,1);
 	RobotDrive controlArmHeight;
 	RobotDrive controlArmTilt;
@@ -113,7 +111,7 @@ public class Robot extends IterativeRobot {
 
 	public void robotInit() {
 		
-    	chassis = new RobotDrive(rearLeft,rearRight);//Ports 1,3 
+    	chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight); //Ports 1, 3 
     	controlArmHeight = new RobotDrive(armHeight,armHeight);
     	controlArmTilt = new RobotDrive(armTilt,armTilt);
     	
@@ -123,9 +121,9 @@ public class Robot extends IterativeRobot {
     	leftStick = new Joystick(1);
     	
     	/*Delete this to fix*/
-    	//chassis.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
+    	chassis.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
     	chassis.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
-    	//chassis.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
+    	chassis.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
     	chassis.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);    	    	
     	/*Don't delete after this*/
     	
@@ -181,19 +179,19 @@ public class Robot extends IterativeRobot {
      */
     @SuppressWarnings("deprecation")
 	public void teleopPeriodic() {
-    	NIVision.IMAQdxStartAcquisition(session);
+    	NIVision.IMAQdxStartAcquisition(session);        
 
         /**
          * grab an image, draw the circle, and provide it for the camera server
          * which will in turn send it to the dash board.
-         */
-        NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
-         while (isOperatorControl() && isEnabled()) {
-        	 NIVision.IMAQdxGrab(session, frame, 1);
-        	 /*NIVision.imaqDrawShapeOnImage(frame, frame, rect,
-        			 DrawMode.DRAW_VALUE, ShapeMode.SHAPE_OVAL, 0.0f);*/
-                
-        	 CameraServer.getInstance().setImage(frame);            
+         * Testing, won't likely be in final code.
+         */    	
+    	/*NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+        while (isOperatorControl() && isEnabled()) {
+        	NIVision.IMAQdxGrab(session, frame, 1);                
+        	CameraServer.getInstance().setImage(frame);
+        }*/
+                        
     	
     	//Display to dash board
     	SmartDashboard.putBoolean("Right Stick - Button 1", rightStick.getRawButton(1));
@@ -208,14 +206,16 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putNumber("Right Stick - POV", rightStick.getPOV());
     	
     	//arcade drive:
-        chassis.arcadeDrive(rightStick);
+        //chassis.arcadeDrive(rightStick);
         
         //tank drive:
-        chassis.setSafetyEnabled(true);        
+        /*chassis.setSafetyEnabled(true);        
     	while (isOperatorControl() && isEnabled()) {
     		chassis.tankDrive(rightStick, leftStick);
         	Timer.delay(0.005);		// wait for a motor update time
-    	}         
+    	}*/
+    	chassis.tankDrive(rightStick, leftStick);
+    	
         //data to dash board
         SmartDashboard.putNumber("Chassis", autoLoopCounter);
         
@@ -246,9 +246,9 @@ public class Robot extends IterativeRobot {
         //chassis.drive(rightStick.getRawAxis(2), -1);
         
         //controlArmHeight.drive(rightStick.getRawAxis(2), 0.0);
-        //controlArmTilt.drive(rightStick.getRawAxis(2), 0.0);
-         }
-         NIVision.IMAQdxStopAcquisition(session);        
+        //controlArmTilt.drive(rightStick.getRawAxis(2), 0.0);         
+         NIVision.IMAQdxStopAcquisition(session);  
+         
     }
     
     /**
