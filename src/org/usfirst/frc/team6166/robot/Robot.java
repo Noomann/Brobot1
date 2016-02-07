@@ -15,20 +15,8 @@ import edu.wpi.first.wpilibj.RobotDrive;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Victor;//arm motors
-import edu.wpi.first.wpilibj.Spark;
-import edu.wpi.first.wpilibj.buttons.Button;
-import edu.wpi.first.wpilibj.buttons.JoystickButton;
-
-/**
- * The VM is configured to automatically run this class, and to call the
- * functions corresponding to each mode, as described in the IterativeRobot
- * documentation. If you change the name of this class or the package after
- * creating this project, you must also update the manifest file in the resource
- * directory.
- */
-
-
+import edu.wpi.first.wpilibj.Victor;	//Arm Motors
+import edu.wpi.first.wpilibj.Spark;		//Drive Motors
 
 /**
  * MOTOR PORT INFORMATION
@@ -93,13 +81,13 @@ public class Robot extends IterativeRobot {
 	  * 
 	  */
     
-    //chassis controller 
+    //Chassis Motor Controllers
     Spark frontRight = new Spark(0);	// Right Front
     Spark rearRight = new Spark(1);		// Right Rear
     Spark frontLeft = new Spark(2);		// Left Front
 	Spark rearLeft = new Spark(3);		// Left Rear			
 	
-	//arm motors
+	//Arm Motors
 	Victor armHeight = new Victor(4);	// Arm Height
 	Victor armTilt = new Victor(5);		// Arm Tilt
 	
@@ -115,17 +103,14 @@ public class Robot extends IterativeRobot {
     	controlArmHeight = new RobotDrive(armHeight,armHeight);
     	controlArmTilt = new RobotDrive(armTilt,armTilt);
     	
-    	//!!!!!!ONLY FRONT LEFT AND RIGHT
-    	
     	rightStick = new Joystick(0);
     	leftStick = new Joystick(1);
     	
-    	/*Delete this to fix*/
+    	/*Currently all of these need to be inverted for it to work.*/
     	chassis.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
     	chassis.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
     	chassis.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
     	chassis.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);    	    	
-    	/*Don't delete after this*/
     	
     	//vision
         frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
@@ -143,7 +128,7 @@ public class Robot extends IterativeRobot {
 	
     public void autonomousInit() {
     	
-    	n = 3;
+    	n = 3;	// n = duration in seconds.
     	autoLoopCounter = 0;
     }
 
