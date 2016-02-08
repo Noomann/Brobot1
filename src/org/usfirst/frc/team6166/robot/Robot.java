@@ -194,11 +194,10 @@ public class Robot extends IterativeRobot {
         //chassis.arcadeDrive(rightStick);
         
         //tank drive:
-        /*chassis.setSafetyEnabled(true);        
+        //chassis.setSafetyEnabled(true);        
     	while (isOperatorControl() && isEnabled()) {
     		chassis.tankDrive(rightStick, leftStick);
-        	Timer.delay(0.005);		// wait for a motor update time
-    	}*/
+    	}
     	chassis.tankDrive(rightStick, leftStick);
     	
         //data to dash board
