@@ -96,10 +96,12 @@ public class Robot extends IterativeRobot {
 	  */
     
     //chassis controller 
-    Spark frontRight = new Spark(0);	// Right Front
-    Spark rearRight = new Spark(1);		// Right Rear
-    Spark frontLeft = new Spark(2);		// Left Front
-	Spark rearLeft = new Spark(3);		// Left Rear			
+    Spark right = new Spark(0);
+    Spark left = new Spark(1);
+    //Spark frontRight = new Spark(0);	// Right Front
+    //Spark rearRight = new Spark(1);		// Right Rear
+    //Spark frontLeft = new Spark(3);		// Left Front
+	//Spark rearLeft = new Spark(2);		// Left Rear			
 	
 	//arm motors
 	Victor armHeight = new Victor(4);	// Arm Height
@@ -113,8 +115,9 @@ public class Robot extends IterativeRobot {
 
 	public void robotInit() {
 		
-    	chassis = new RobotDrive(rearLeft,rearRight);//Ports 1,3 
-    	controlArmHeight = new RobotDrive(armHeight,armHeight);
+    	//chassis = new RobotDrive(frontLeft,rearLeft,frontRight,rearRight);//Ports 0,1,2,3 
+    	chassis = new RobotDrive(left,right);
+		controlArmHeight = new RobotDrive(armHeight,armHeight);
     	controlArmTilt = new RobotDrive(armTilt,armTilt);
     	
     	//!!!!!!ONLY FRONT LEFT AND RIGHT
@@ -208,7 +211,7 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putNumber("Right Stick - POV", rightStick.getPOV());
     	
     	//arcade drive:
-        chassis.arcadeDrive(rightStick);
+       // chassis.arcadeDrive(rightStick);
         
         //tank drive:
         chassis.setSafetyEnabled(true);        
@@ -226,17 +229,17 @@ public class Robot extends IterativeRobot {
         }
         
         if(rightStick.getRawButton(2)){//Reverse
-        	chassis.drive(0.375, 0.0);
+        	chassis.drive(0.25, 0.0);
         }
         
         if(rightStick.getRawButton(3)){//Left turn
-        	chassis.drive(0.375, 1);
-        	chassis.drive(-0.375, -1);
+        	chassis.drive(0.25, 1);
+        	chassis.drive(-0.25, -1);
         }
         
         if(rightStick.getRawButton(4)){//Right turn
-        	chassis.drive(-0.375, 1);
-        	chassis.drive(0.375, -1);
+        	chassis.drive(-0.25, 1);
+        	chassis.drive(0.25, -1);
         }
         
         //Camera
