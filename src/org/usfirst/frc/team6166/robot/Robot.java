@@ -171,11 +171,13 @@ public class Robot extends IterativeRobot {
          * which will in turn send it to the dash board.
          * Testing, won't likely be in final code.
          */    	
-    	/*NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
+    	//NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
         while (isOperatorControl() && isEnabled()) {
         	NIVision.IMAQdxGrab(session, frame, 1);                
         	CameraServer.getInstance().setImage(frame);
-        }*/
+        	chassis.arcadeDrive(rightStick);
+        	//chassis.tankDrive(rightStick, leftStick);
+        }
                         
     	
     	//Display to dash board
@@ -194,11 +196,8 @@ public class Robot extends IterativeRobot {
         //chassis.arcadeDrive(rightStick);
         
         //tank drive:
-        //chassis.setSafetyEnabled(true);        
-    	while (isOperatorControl() && isEnabled()) {
-    		chassis.tankDrive(rightStick, leftStick);
-    	}
-    	chassis.tankDrive(rightStick, leftStick);
+        //chassis.setSafetyEnabled(true);
+    	
     	
         //data to dash board
         SmartDashboard.putNumber("Chassis", autoLoopCounter);
