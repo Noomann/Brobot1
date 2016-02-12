@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.Victor;	//Arm Motors
+import edu.wpi.first.wpilibj.VictorSP;
 import edu.wpi.first.wpilibj.Spark;		//Drive Motors
 
 /**
@@ -38,8 +39,12 @@ public class Robot extends IterativeRobot {
 	RobotDrive controlArmTilt;
 	Joystick rightStick;// = new Joystick(0);
 	Joystick leftStick;// = new Joystick(1);
+	
 	int n;
-	int autoLoopCounter;
+	int X;
+	int Y;
+	int Z;
+	
 	int session;
     Image frame;
 	/*
@@ -88,9 +93,8 @@ public class Robot extends IterativeRobot {
 	Spark rearLeft = new Spark(3);		// Left Rear			
 	
 	//Arm Motors
-	Victor armHeight = new Victor(4);	// Arm Height
-	Victor armTilt = new Victor(5);		// Arm Tilt
-	
+	VictorSP armHeight = new VictorSP(4);	// Arm Height
+	VictorSP armTilt = new VictorSP(5);		// Arm Tilt
 	
     /**
      * This function is run when the robot is first started up and should be
@@ -99,9 +103,10 @@ public class Robot extends IterativeRobot {
 
 	public void robotInit() {
 		
-    	chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight); //Ports 1, 3 
+    	chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight); 
     	controlArmHeight = new RobotDrive(armHeight,armHeight);
     	controlArmTilt = new RobotDrive(armTilt,armTilt);
+    	
     	
     	rightStick = new Joystick(0);
     	leftStick = new Joystick(1);
@@ -128,8 +133,11 @@ public class Robot extends IterativeRobot {
 	
     public void autonomousInit() {
     	
-    	n = 3;	// n = duration in seconds.
-    	autoLoopCounter = 0;
+    	n = 1;	// n = duration in seconds.
+    	X = 0;
+    	Y = 0;
+    	Z = 0;
+    	
     }
 
     /**
@@ -137,10 +145,23 @@ public class Robot extends IterativeRobot {
      */
     
     public void autonomousPeriodic() {
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", autoLoopCounter);
-    	if(autoLoopCounter < 50 * n) {//based on this, 50n = ~n second		
-			chassis.drive(0.0, 0.0); 	// drive forwards half speed (- is forward, + backward) (-0.5,0)
-			autoLoopCounter++;
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n) {//based on this, 50n = ~n second    		
+    		chassis.drive(-0.5, 0.0);
+			//armTilt.set(-0.5);			
+			X++;
+		} else if (Y < 50 * n) {
+			//chassis.drive(-0.25, 0.0);  // drive forwards half speed (- is forward, + backward) (-0.5,0))
+			//armHeight.set(-0.5);
+			Y++;
+		} else if (Y < 50 * n * 2) {
+			//chassis.drive(0.0, 0.0);					
+			//armHeight.set(-0.5);
+			Y++;
+		} else if (Z < 50 * n * .5) {
+			//armTilt.set(0.125);
+			//armHeight.set(0.125);
+			Z++;
 		} else {
 			chassis.drive(0.0, 0.0); 	// stop robot
 		}
@@ -175,13 +196,40 @@ public class Robot extends IterativeRobot {
         while (isOperatorControl() && isEnabled()) {
         	NIVision.IMAQdxGrab(session, frame, 1);                
         	CameraServer.getInstance().setImage(frame);
-        	chassis.arcadeDrive(rightStick);
+        	chassis.arcadeDrive(rightStick, true);
         	//chassis.tankDrive(rightStick, leftStick);
+        	
+        	if(rightStick.getRawButton(1)){//Forward
+                //chassis.drive(-0.375, 0.0);
+            	chassis.drive(-0.5, 0.0);
+            }
+        	
+        	if(rightStick.getRawButton(2)){//Reverse
+            	chassis.drive(0.375, 0.0);
+            }
+        	
+        	if(rightStick.getRawButton(3)){//Left turn
+            	chassis.drive(0.375, 1);
+            	chassis.drive(-0.375, -1);
+            }
+            
+            if(rightStick.getRawButton(4)){//Right turn
+            	chassis.drive(-0.375, 1);
+            	chassis.drive(0.375, -1);
+            }
+            
+            if(rightStick.getRawButton(5)) {
+            	armHeight.set(-0.5);
+            }
+            
+            if(rightStick.getRawButton(6)) {
+            	armTilt.set(-0.125);
+            }            
         }
                         
     	
     	//Display to dash board
-    	SmartDashboard.putBoolean("Right Stick - Button 1", rightStick.getRawButton(1));
+    	/*SmartDashboard.putBoolean("Right Stick - Button 1", rightStick.getRawButton(1));
     	SmartDashboard.putBoolean("Right Stick - Button 2", rightStick.getRawButton(2));
     	SmartDashboard.putBoolean("Right Stick - Button 3", rightStick.getRawButton(3));
     	SmartDashboard.putBoolean("Right Stick - Button 4", rightStick.getRawButton(4));
@@ -190,7 +238,7 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putNumber("Right Stick - Y Axis", rightStick.getRawAxis(1));
     	SmartDashboard.putNumber("Right Stick - Twist", rightStick.getRawAxis(2));
     	SmartDashboard.putNumber("Right Stick - Slider", rightStick.getRawAxis(3));
-    	SmartDashboard.putNumber("Right Stick - POV", rightStick.getPOV());
+    	SmartDashboard.putNumber("Right Stick - POV", rightStick.getPOV());*/
     	
     	//arcade drive:
         //chassis.arcadeDrive(rightStick);
@@ -200,7 +248,7 @@ public class Robot extends IterativeRobot {
     	
     	
         //data to dash board
-        SmartDashboard.putNumber("Chassis", autoLoopCounter);
+        SmartDashboard.putNumber("Chassis", X);
         
         //buttons
         if(rightStick.getRawButton(1)){//Forward
