@@ -1,23 +1,19 @@
 package org.usfirst.frc.team6166.robot;
 
-import edu.wpi.first.wpilibj.CounterBase.EncodingType;
+import edu.wpi.first.wpilibj.DigitalInput;
 
 import com.ni.vision.NIVision;
-import com.ni.vision.NIVision.DrawMode;
 import com.ni.vision.NIVision.Image;
-import com.ni.vision.NIVision.ShapeMode;
 
 import edu.wpi.first.wpilibj.CameraServer;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.IterativeRobot;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.RobotDrive;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.Victor;	//Arm Motors
-import edu.wpi.first.wpilibj.VictorSP;
+import edu.wpi.first.wpilibj.VictorSP;	//Arm Motors
 import edu.wpi.first.wpilibj.Spark;		//Drive Motors
+import edu.wpi.first.wpilibj.Counter;
 
 /**
  * MOTOR PORT INFORMATION
@@ -45,46 +41,12 @@ public class Robot extends IterativeRobot {
 	int Y;
 	int Z;
 	
+	DigitalInput limitSwitch = new DigitalInput(0);
+	Counter counter = new Counter(limitSwitch);
+	boolean armUp;	
+	
 	int session;
     Image frame;
-	/*
-	 * ENCODERS
-	 * 
-	 * 
-	 * Explanation:
-	 * 
-	 * Setting encoder parameters:
-	 * 
-	 * Encoder encoder1 = new Encoder(0, 1, false, Encoder.EncodingType.k4X);
-	 * encoder1.setMaxPeriod(.1);
-	 * encoder1.setMinRate(10);
-	 * encoder1.setDistancePerPulse(5);
-	 * encoder1.setReverseDirection(true);
-	 * encoder1.setSamplesToAverage(7);
-	 * 
-	 * Reset Encoder:
-	 * 
-	 * encoder1.reset();
-	 * 
-	 * Getting encoder values:
-	 * 
-	 * int count = sampleEncoder.get();
-	 * double distance = sampleEncoder.getRaw();
-	 * double distance = sampleEncoder.getDistance();
-	 * double period = sampleEncoder.getPeriod();
-	 * double rate = sampleEncoder.getRate();
-	 * boolean direction = sampleEncoder.getDirection();
-	 * boolean stopped = sampleEncoder.getStopped();
-	 * 
-	 */
-	
-	 /*
-	  * ANALOG INPUT
-	  * 
-	  * AnalogInput ai;
-	  * ai = new AnalogInput(0);
-	  * 
-	  */
     
     //Chassis Motor Controllers
     Spark frontRight = new Spark(0);	// Right Front
@@ -100,6 +62,14 @@ public class Robot extends IterativeRobot {
      * This function is run when the robot is first started up and should be
      * used for any initialization code.
      */
+	
+	public boolean isSwitchSet() {
+		return counter.get() > 0;
+	}
+	
+	public void initializeCounter() {
+		counter.reset();
+	}
 
 	public void robotInit() {
 		
@@ -183,48 +153,34 @@ public class Robot extends IterativeRobot {
      * @version 2/5/2016
      *   
      */
-    @SuppressWarnings("deprecation")
-	public void teleopPeriodic() {
-    	NIVision.IMAQdxStartAcquisition(session);        
+	public void teleopPeriodic() {    	
+    	NIVision.IMAQdxStartAcquisition(session);
 
-        /**
-         * grab an image, draw the circle, and provide it for the camera server
-         * which will in turn send it to the dash board.
-         * Testing, won't likely be in final code.
-         */    	
-    	//NIVision.Rect rect = new NIVision.Rect(10, 10, 100, 100);
         while (isOperatorControl() && isEnabled()) {
         	NIVision.IMAQdxGrab(session, frame, 1);                
         	CameraServer.getInstance().setImage(frame);
         	chassis.arcadeDrive(rightStick, true);
         	//chassis.tankDrive(rightStick, leftStick);
         	
-        	if(rightStick.getRawButton(1)){//Forward
-                //chassis.drive(-0.375, 0.0);
-            	chassis.drive(-0.5, 0.0);
-            }
-        	
-        	if(rightStick.getRawButton(2)){//Reverse
-            	chassis.drive(0.375, 0.0);
-            }
-        	
-        	if(rightStick.getRawButton(3)){//Left turn
-            	chassis.drive(0.375, 1);
-            	chassis.drive(-0.375, -1);
+        	if(rightStick.getRawButton(3)){//Arm Height Down
+        		armHeight.set(0.125);        		
             }
             
-            if(rightStick.getRawButton(4)){//Right turn
-            	chassis.drive(-0.375, 1);
-            	chassis.drive(0.375, -1);
+            if(rightStick.getRawButton(4)){//Arm Tilt Down
+            	armTilt.set(0.1);
+            	initializeCounter();
+            } else if(armUp == true) {
+            	armTilt.set(-.05);
             }
             
-            if(rightStick.getRawButton(5)) {
-            	armHeight.set(-0.5);
+            if(rightStick.getRawButton(5)) {//Arm Height Up
+            	armHeight.set(-0.125);
             }
             
-            if(rightStick.getRawButton(6)) {
-            	armTilt.set(-0.125);
+            if(rightStick.getRawButton(6) && armUp != true) {//Arm Tilt Up
+            	armTilt.set(-0.2);
             }            
+            
         }
                         
     	
@@ -248,37 +204,8 @@ public class Robot extends IterativeRobot {
     	
     	
         //data to dash board
-        SmartDashboard.putNumber("Chassis", X);
-        
-        //buttons
-        if(rightStick.getRawButton(1)){//Forward
-            //chassis.drive(-0.375, 0.0);
-        	chassis.drive(-0.5, 0.0);
-        }
-        
-        if(rightStick.getRawButton(2)){//Reverse
-        	chassis.drive(0.375, 0.0);
-        }
-        
-        if(rightStick.getRawButton(3)){//Left turn
-        	chassis.drive(0.375, 1);
-        	chassis.drive(-0.375, -1);
-        }
-        
-        if(rightStick.getRawButton(4)){//Right turn
-        	chassis.drive(-0.375, 1);
-        	chassis.drive(0.375, -1);
-        }
-        
-        //Camera
-        //chassis.drive(rightStick.getPOV(), 0.0);        
-        
-        //chassis.drive(rightStick.getRawAxis(2), 1);
-        //chassis.drive(rightStick.getRawAxis(2), -1);
-        
-        //controlArmHeight.drive(rightStick.getRawAxis(2), 0.0);
-        //controlArmTilt.drive(rightStick.getRawAxis(2), 0.0);         
-         NIVision.IMAQdxStopAcquisition(session);  
+        SmartDashboard.putNumber("Chassis", X);         
+        NIVision.IMAQdxStopAcquisition(session);  
          
     }
     
