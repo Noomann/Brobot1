@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.VictorSP;	//Arm Motors
 import edu.wpi.first.wpilibj.Spark;		//Drive Motors
 import edu.wpi.first.wpilibj.Counter;
+import edu.wpi.first.wpilibj.AnalogGyro;
 
 /**
  * MOTOR PORT INFORMATION
@@ -63,8 +64,11 @@ public class Robot extends IterativeRobot {
      * used for any initialization code.
      */
 	
-	public boolean isSwitchSet() {
-		return counter.get() > 0;
+	private AnalogGyro gyro;
+	double Kp = 0.03;
+	
+	public boolean isSwitchSet() {		
+		return counter.get() > 0;		
 	}
 	
 	public void initializeCounter() {
@@ -72,7 +76,7 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void robotInit() {
-		
+		gyro = new AnalogGyro(0);
     	chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight); 
     	controlArmHeight = new RobotDrive(armHeight,armHeight);
     	controlArmTilt = new RobotDrive(armTilt,armTilt);
@@ -103,6 +107,8 @@ public class Robot extends IterativeRobot {
 	
     public void autonomousInit() {
     	
+    	gyro.reset();
+    	
     	n = 1;	// n = duration in seconds.
     	X = 0;
     	Y = 0;
@@ -115,10 +121,14 @@ public class Robot extends IterativeRobot {
      */
     
     public void autonomousPeriodic() {
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(X < 50 * n) {//based on this, 50n = ~n second    		
-    		chassis.drive(-0.5, 0.0);
-			//armTilt.set(-0.5);			
+    	
+    	double angle = gyro.getAngle();
+    	gyro.reset();
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);    	
+    	if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
+    		chassis.drive(-0.25, angle*Kp);
+			//armTilt.set(-0.5);
 			X++;
 		} else if (Y < 50 * n) {
 			//chassis.drive(-0.25, 0.0);  // drive forwards half speed (- is forward, + backward) (-0.5,0))
@@ -157,29 +167,33 @@ public class Robot extends IterativeRobot {
     	NIVision.IMAQdxStartAcquisition(session);
 
         while (isOperatorControl() && isEnabled()) {
+        	
+        	armUp = isSwitchSet();
+        	
         	NIVision.IMAQdxGrab(session, frame, 1);                
         	CameraServer.getInstance().setImage(frame);
         	chassis.arcadeDrive(rightStick, true);
         	//chassis.tankDrive(rightStick, leftStick);
         	
+            if(rightStick.getRawButton(5)) {//Arm Height Up
+            	armHeight.set(-0.25);
+            }
         	if(rightStick.getRawButton(3)){//Arm Height Down
-        		armHeight.set(0.125);        		
+        		armHeight.set(0.25);        		
             }
             
-            if(rightStick.getRawButton(4)){//Arm Tilt Down
+        	if(rightStick.getRawButton(6) && armUp != true) {//Arm Tilt Up
+            	armTilt.set(-0.3);
+            }
+        	if(rightStick.getRawButton(4)){//Arm Tilt Down
             	armTilt.set(0.1);
             	initializeCounter();
             } else if(armUp == true) {
-            	armTilt.set(-.05);
+            	armTilt.set(-.075);
             }
             
-            if(rightStick.getRawButton(5)) {//Arm Height Up
-            	armHeight.set(-0.125);
-            }
             
-            if(rightStick.getRawButton(6) && armUp != true) {//Arm Tilt Up
-            	armTilt.set(-0.2);
-            }            
+                        
             
         }
                         
