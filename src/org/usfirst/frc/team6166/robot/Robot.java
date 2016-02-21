@@ -238,20 +238,52 @@ public class Robot extends IterativeRobot {
     	double angle = gyro.getAngle();
     	gyro.reset();
     	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(angle > 270 && angle <= 360) {//based on this, 50n = ~n second    		
+    	if(angle == 270) {
+    		
+    	}
+    	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
     		chassis.tankDrive(0.15, -0.15);
 			//armTilt.set(-0.5);
 			X++;
+    	}
+    	else if(angle >= 0 && angle <=90){
+    		
+    		chassis.tankDrive(0.15, -0.15);
+    	}
+    	else if(angle > 90 && angle < 270) {
+    		
+    		chassis.tankDrive(-0.15, 0.15);
+    	}
+    	else {
+    		
+    		chassis.drive(0.0, 0.0);
     	}
     }
     
     private void autonomousTurn90Right() {
     	
+    	double angle = gyro.getAngle();
+    	gyro.reset();
     	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(X < 50 * n * 2) {//based on this, 50n = ~n second    		
+    	if(angle == 90) {
+    		
+    	}
+    	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
     		chassis.tankDrive(-0.15, 0.15);
 			//armTilt.set(-0.5);
 			X++;
+    	}
+    	else if(angle >= 0 && angle <90){
+    		
+    		chassis.tankDrive(-0.15, 0.15);
+    	}
+    	else if(angle > 90 && angle < 270) {
+    		
+    		chassis.tankDrive(0.15, -0.15);
+    	}
+    	else {
+    		
+    		chassis.drive(0.0, 0.0);
     	}
     }
     
