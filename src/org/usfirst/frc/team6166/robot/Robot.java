@@ -233,7 +233,6 @@ public class Robot extends IterativeRobot {
 			chassis.drive(-0.25, angle*Kp);
 			//armTilt.set(-0.5);
 			X++;
-<<<<<<< HEAD
     	}
     }
     
@@ -290,55 +289,27 @@ public class Robot extends IterativeRobot {
     	}
     }
     
-    private void autonomousTurn180Left() {
+    private void autonomousTurn180() {
     	
+    	double angle = gyro.getAngle();
+    	gyro.reset();
     	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(X < 50 * n * 4) {//based on this, 50n = ~n second    		
+    	if(angle == 180) {
+    		
+    	}
+    	if(angle > 180 && angle <= 360 ) {//based on this, 50n = ~n second    		
     		chassis.tankDrive(0.15, -0.15);
-=======
-		}
-	}
-
-	private void autonomousTurn90Left() {
-		double angle = gyro.getAngle();
-		gyro.reset();
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(angle > 270 && angle <= 360) {//based on this, 50n = ~n second    		
-			chassis.tankDrive(0.15, -0.15);
 			//armTilt.set(-0.5);
 			X++;
-		}
-	}
-
-	private void autonomousTurn90Right() {
-
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 2) {//based on this, 50n = ~n second    		
-			chassis.tankDrive(-0.15, 0.15);
-			//armTilt.set(-0.5);
-			X++;
-		}
-	}
-
-	private void autonomousTurn180Left() {
-
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 4) {//based on this, 50n = ~n second    		
-			chassis.tankDrive(0.15, -0.15);
->>>>>>> origin/master
-			//armTilt.set(-0.5);
-			X++;
-		}
-	}
-
-	private void autonomousTurn180Right() {
-
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 4) {//based on this, 50n = ~n second    		
-			chassis.tankDrive(-0.15, 0.15);
-			//armTilt.set(-0.5);
-			X++;
-		}
+    	}
+    	else if(angle >= 0 && angle < 180){
+    		
+    		chassis.tankDrive(-0.15, 0.15);
+    	}
+    	else {
+    		
+    		chassis.drive(0.0, 0.0);
+    	}
 	}
 
 	/**
