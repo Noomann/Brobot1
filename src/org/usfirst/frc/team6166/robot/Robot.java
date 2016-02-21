@@ -129,7 +129,7 @@ public class Robot extends IterativeRobot {
 	/**
 	 * This function is called periodically during autonomous
 	 */
-	private void autonomousExample() {
+	/*private void autonomousExample() {
 
 		double angle = gyro.getAngle();
 		gyro.reset();
@@ -158,16 +158,17 @@ public class Robot extends IterativeRobot {
 
 			chassis.drive(0.0, 0.0); 	// stop robot
 		}
-	}
+	}*/
 
 	public void autonomousPeriodic() {
 
 		//Only Run one obstacle at a time!
 
-		autonomousRoughTerrain();
+		//autonomousRoughTerrain();
 		//autonomousRamparts();
 		//autonomousBoop();
-		//autonomousLowBar();
+		//autonomousPortCullis();
+		autonomousLowBar();
 		//autonomousTurn90Left();
 		//autonomousTurn90Right();
 		//autonomousTurn180Left();
@@ -185,6 +186,24 @@ public class Robot extends IterativeRobot {
 			X++;
 		}
 	}
+	
+	private void autonomousPortCullis(){
+		double angle = gyro.getAngle();
+		gyro.reset();
+
+		SmartDashboard.putNumber("Time - " + n + " Seconds", X);		
+		if(X < 50 * n * .5) {//based on this, 50n = ~n second
+			armHeight.set(.4);
+			//chassis.drive(-0.25, angle*Kp);
+			X++;
+		} else if (Y < 50 * n * 4){
+			chassis.drive(-.35, angle*Kp);
+			Y++;
+		} else if (Z < 50 * n * .5){
+			armHeight.set(-.4);
+			Z++;
+		}
+	}
 
 	private void autonomousLowBar() {
 
@@ -192,8 +211,8 @@ public class Robot extends IterativeRobot {
 		gyro.reset();
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 7) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.25, angle*Kp);
+		if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
+			chassis.drive(-0.3, angle*Kp);
 			X++;
 		}
 	}
@@ -301,11 +320,11 @@ public class Robot extends IterativeRobot {
 
 		chassis.arcadeDrive(rightStick, true);
 
-		if(rightStick.getRawButton(3)) {//Arm Height Up Fast Button 5 normal
+		if(rightStick.getRawButton(3)) {
 			armHeight.set(-0.40);
 		}
 
-		if(rightStick.getRawButton(5)){//Arm Height Down Fast button 3 normal
+		if(rightStick.getRawButton(5)){
 			armHeight.set(0.3);        		
 		}
 
