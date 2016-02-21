@@ -211,7 +211,7 @@ public class Robot extends IterativeRobot {
 		gyro.reset();
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
+		if(X < 50 * n * 3) {//based on this, 50n = ~n second    		
 			chassis.drive(-0.3, angle*Kp);
 			X++;
 		}
