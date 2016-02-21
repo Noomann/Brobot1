@@ -15,6 +15,9 @@ import edu.wpi.first.wpilibj.VictorSP;	//Arm Motors
 import edu.wpi.first.wpilibj.Spark;		//Drive Motors
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.AnalogGyro;
+import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.buttons.*;
+
 
 /**
  * MOTOR PORT INFORMATION
@@ -25,12 +28,13 @@ import edu.wpi.first.wpilibj.AnalogGyro;
  * 2: left front - Spark motor controller - BLACK
  * 3: left rear - Spark motor controller - BLACK
  * 
- * 4: front height - Victor motor controller
+ * 4: front height - Victor motor controller 
  * 5: front tilt - Victor motor controller
  * 
  */
 
 public class Robot extends IterativeRobot {
+	
 	RobotDrive chassis;// = new RobotDrive(0,1);
 	RobotDrive controlArmHeight;
 	RobotDrive controlArmTilt;
@@ -42,6 +46,7 @@ public class Robot extends IterativeRobot {
 	int Y;
 	int Z;
 	
+	double joystickPOV;
 	DigitalInput limitSwitch = new DigitalInput(0);
 	Counter counter = new Counter(limitSwitch);
 	boolean armUp;	
@@ -67,15 +72,18 @@ public class Robot extends IterativeRobot {
 	private AnalogGyro gyro;
 	double Kp = 0.03;
 	
-	public boolean isSwitchSet() {		
+	public boolean isSwitchSet() {
+		
 		return counter.get() > 0;		
 	}
 	
 	public void initializeCounter() {
+		
 		counter.reset();
 	}
 
 	public void robotInit() {
+		
 		gyro = new AnalogGyro(0);
     	chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight); 
     	controlArmHeight = new RobotDrive(armHeight,armHeight);
@@ -119,8 +127,7 @@ public class Robot extends IterativeRobot {
     /**
      * This function is called periodically during autonomous
      */
-    
-    public void autonomousPeriodic() {
+    private void autonomousExample() {
     	
     	double angle = gyro.getAngle();
     	gyro.reset();
@@ -131,94 +138,222 @@ public class Robot extends IterativeRobot {
 			//armTilt.set(-0.5);
 			X++;
 		} else if (Y < 50 * n) {
+			
 			//chassis.drive(-0.25, 0.0);  // drive forwards half speed (- is forward, + backward) (-0.5,0))
 			//armHeight.set(-0.5);
 			Y++;
 		} else if (Y < 50 * n * 2) {
+			
 			//chassis.drive(0.0, 0.0);					
 			//armHeight.set(-0.5);
 			Y++;
 		} else if (Z < 50 * n * .5) {
+			
 			//armTilt.set(0.125);
 			//armHeight.set(0.125);
 			Z++;
 		} else {
+			
 			chassis.drive(0.0, 0.0); 	// stop robot
 		}
+    }
+    
+    public void autonomousPeriodic() {
+    	
+    	//Only Run one obstacle at a time!
+    	
+    	autonomousRoughTerrain();
+    	//autonomousRamparts();
+    	//autonomousBoop();
+    	//autonomousLowBar();
+    	//autonomousTurn90Left();
+    	//autonomousTurn90Right();
+    	//autonomousTurn180Left();
+    	//autonomousTurn180Right();
+    }
+    
+    private void autonomousBoop() {
+    	
+    	double angle = gyro.getAngle();
+    	gyro.reset();
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n * 4) {//based on this, 50n = ~n second    		
+    		chassis.drive(-0.25, angle*Kp);
+			X++;
+		}
+    }
+    
+    private void autonomousLowBar() {
+    	
+    	double angle = gyro.getAngle();
+    	gyro.reset();
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n * 7) {//based on this, 50n = ~n second    		
+    		chassis.drive(-0.25, angle*Kp);
+			X++;
+		}
+    }
+    
+    private void autonomousRoughTerrain() {
+    	
+    	double angle = gyro.getAngle();
+    	gyro.reset();
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n * 2.5) {//based on this, 50n = ~n second    		
+    		chassis.drive(-0.4, angle*Kp);
+			X++;
+		}
+    }
+    
+    /*private void autonomousMoat() {//WARNING NOT CALIBRATED DO NOT USE
+     
+    	double angle = gyro.getAngle();
+    	gyro.reset();
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n * 2) {//based on this, 50n = ~n second    		
+    		chassis.drive(-0.4, angle*Kp);
+			//armTilt.set(-0.5);
+			X++;
+		}
+    }*/
+    
+    private void autonomousRamparts() {//WARNING NOT CALIBRATED DO NOT USE
+    	
+    	double angle = gyro.getAngle();
+    	gyro.reset();
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
+    		chassis.drive(-0.25, angle*Kp);
+			//armTilt.set(-0.5);
+			X++;
+    	}
+    }
+    
+    private void autonomousTurn90Left() {
+    	double angle = gyro.getAngle();
+    	gyro.reset();
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(angle > 270 && angle <= 360) {//based on this, 50n = ~n second    		
+    		chassis.tankDrive(0.15, -0.15);
+			//armTilt.set(-0.5);
+			X++;
+    	}
+    }
+    
+    private void autonomousTurn90Right() {
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n * 2) {//based on this, 50n = ~n second    		
+    		chassis.tankDrive(-0.15, 0.15);
+			//armTilt.set(-0.5);
+			X++;
+    	}
+    }
+    
+    private void autonomousTurn180Left() {
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n * 4) {//based on this, 50n = ~n second    		
+    		chassis.tankDrive(0.15, -0.15);
+			//armTilt.set(-0.5);
+			X++;
+    	}
+    }
+    
+    private void autonomousTurn180Right() {
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
+    	if(X < 50 * n * 4) {//based on this, 50n = ~n second    		
+    		chassis.tankDrive(-0.15, 0.15);
+			//armTilt.set(-0.5);
+			X++;
+    	}
     }
     
     /**
      * This function is called once each time the robot enters tele-operated mode
      */
-    public void teleopInit(){
+    public void teleopInit() {
     	
     }
 
     /**
-     * 
      * This function is called periodically during operator control
+     * 
      * @see edu.wpi.first.wpilibj.IterativeRobot#teleopPeriodic()
      * @param
      * @author Holmen Robotics
      * @version 2/5/2016
      *   
      */
-	public void teleopPeriodic() {    	
+	
+	public void teleopPeriodic() {
+		
     	NIVision.IMAQdxStartAcquisition(session);
 
         while (isOperatorControl() && isEnabled()) {
         	
         	armUp = isSwitchSet();
-        	
+        	joystickPOV = rightStick.getPOV();
         	NIVision.IMAQdxGrab(session, frame, 1);                
         	CameraServer.getInstance().setImage(frame);
         	chassis.arcadeDrive(rightStick, true);
-        	//chassis.tankDrive(rightStick, leftStick);
         	
-            if(rightStick.getRawButton(5)) {//Arm Height Up
-            	armHeight.set(-0.25);
-            }
-        	if(rightStick.getRawButton(3)){//Arm Height Down
-        		armHeight.set(0.25);        		
+            if(rightStick.getRawButton(3)) {//Arm Height Up Fast Button 5 normal
+            	armHeight.set(-0.40);
             }
             
-        	if(rightStick.getRawButton(6) && armUp != true) {//Arm Tilt Up
-            	armTilt.set(-0.3);
+        	if(rightStick.getRawButton(5)){//Arm Height Down Fast button 3 normal
+        		armHeight.set(0.3);        		
             }
-        	if(rightStick.getRawButton(4)){//Arm Tilt Down
-            	armTilt.set(0.1);
-            	initializeCounter();
-            } else if(armUp == true) {
-            	armTilt.set(-.075);
-            }
-            
-            
-                        
+        	
+        	if(joystickPOV == 0.0)//not functioning
+        	{
+        		chassis.arcadeDrive(-0.25, 0.0);
+        	}
+        	
+        	if(joystickPOV == 45.0)
+        	{
+        		chassis.arcadeDrive(-0.15, 45.0);
+        	}
+        	
+        	if(joystickPOV == 90.0)//not functioning
+        	{
+        		chassis.arcadeDrive(-0.25, 45.0);
+        	}
+        	
+        	if(joystickPOV == 135.0)
+        	{
+        		chassis.arcadeDrive(0.15, -45.0);
+        	}
+        	
+        	if(joystickPOV == 180.0)//not functioning
+        	{
+        		chassis.arcadeDrive(0.25, 0.0);
+        	}
+        	
+        	if(joystickPOV == 225.0)
+        	{
+        		chassis.arcadeDrive(0.15, 45.0);
+        	}
+        	
+        	if(joystickPOV == 270.0) {//not functioning{
+        		
+        		chassis.arcadeDrive(0.25, 45.0);
+        	}
+        	
+            if(joystickPOV == 315.0) {
+            	
+            	chassis.arcadeDrive(-0.15, -45.0);
+            }                                  
             
         }
-                        
-    	
-    	//Display to dash board
-    	/*SmartDashboard.putBoolean("Right Stick - Button 1", rightStick.getRawButton(1));
-    	SmartDashboard.putBoolean("Right Stick - Button 2", rightStick.getRawButton(2));
-    	SmartDashboard.putBoolean("Right Stick - Button 3", rightStick.getRawButton(3));
-    	SmartDashboard.putBoolean("Right Stick - Button 4", rightStick.getRawButton(4));
-    	
-    	SmartDashboard.putNumber("Right Stick - X Axis", rightStick.getRawAxis(0));
-    	SmartDashboard.putNumber("Right Stick - Y Axis", rightStick.getRawAxis(1));
-    	SmartDashboard.putNumber("Right Stick - Twist", rightStick.getRawAxis(2));
-    	SmartDashboard.putNumber("Right Stick - Slider", rightStick.getRawAxis(3));
-    	SmartDashboard.putNumber("Right Stick - POV", rightStick.getPOV());*/
-    	
-    	//arcade drive:
-        //chassis.arcadeDrive(rightStick);
         
-        //tank drive:
-        //chassis.setSafetyEnabled(true);
-    	
-    	
-        //data to dash board
-        SmartDashboard.putNumber("Chassis", X);         
         NIVision.IMAQdxStopAcquisition(session);  
          
     }
