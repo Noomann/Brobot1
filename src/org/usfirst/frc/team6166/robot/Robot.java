@@ -168,9 +168,9 @@ public class Robot extends IterativeRobot {
 		//autonomousRamparts();
 		//autonomousBoop();
 		//autonomousPortCullis();
-		autonomousLowBar();
+		//autonomousLowBar();
 		//autonomousTurn90Left();
-		//autonomousTurn90Right();
+		autonomousTurn90Right();
 		//autonomousTurn180Left();
 		//autonomousTurn180Right();
 	}
@@ -361,6 +361,19 @@ public class Robot extends IterativeRobot {
 
 		if(rightStick.getRawButton(5)){
 			armHeight.set(0.3);        		
+		}
+		
+		if(rightStick.getRawButton(11)) {
+			
+			//autonomousRoughTerrain();
+			//autonomousRamparts();
+			//autonomousBoop();
+			//autonomousPortCullis();
+			//autonomousLowBar();
+			//autonomousTurn90Left();
+			autonomousTurn90Right();
+			//autonomousTurn180Left();
+			//autonomousTurn180Right();
 		}
 
 		if(joystickPOV == 0.0)//not functioning
