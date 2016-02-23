@@ -123,6 +123,7 @@ public class Robot extends IterativeRobot {
 		X = 0;
 		Y = 0;
 		Z = 0;
+		
 
 	}
 
@@ -161,6 +162,9 @@ public class Robot extends IterativeRobot {
 	}*/
 
 	public void autonomousPeriodic() {
+		
+		double angle = gyro.getAngle();
+    	gyro.reset();
 
 		//Only Run one obstacle at a time!
 
@@ -283,26 +287,30 @@ public class Robot extends IterativeRobot {
     
     private void autonomousTurn90Right() {
     	
+    	
+    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
     	double angle = gyro.getAngle();
     	gyro.reset();
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
     	if(angle == 90) {
     		
     	}
     	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
-    		chassis.tankDrive(-0.15, 0.15);
-			//armTilt.set(-0.5);
-			X++;
+    		//chassis.tankDrive(-0.15, 0.15);
+    		chassis.drive(-0.375, 1);
+    		chassis.drive(0.375, -1);
     	}
     	else if(angle >= 0 && angle <90){
     		
-    		chassis.tankDrive(-0.15, 0.15);
+    		//chassis.tankDrive(-0.15, 0.15);
+    		chassis.drive(-0.375, 1);
+    		chassis.drive(0.375, -1);
     	}
     	else if(angle > 90 && angle < 270) {
     		
-    		chassis.tankDrive(0.15, -0.15);
-    	}
-    	else {
+    		//chassis.tankDrive(0.15, -0.15);
+    		chassis.drive(-0.375, -1);
+    		chassis.drive(0.375, 1);
+    	} else {
     		
     		chassis.drive(0.0, 0.0);
     	}
@@ -355,12 +363,15 @@ public class Robot extends IterativeRobot {
 
 		chassis.arcadeDrive(rightStick, true);
 
-		if(rightStick.getRawButton(3)) {
+		if(rightStick.getRawButton(3) && armUp != true) {
 			armHeight.set(-0.40);
 		}
 
 		if(rightStick.getRawButton(5)){
-			armHeight.set(0.3);        		
+			armHeight.set(0.3);
+			initializeCounter();
+		} else if (armUp==true){
+			armTilt.set(0);
 		}
 		
 		if(rightStick.getRawButton(11)) {
