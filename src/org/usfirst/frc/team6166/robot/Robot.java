@@ -15,8 +15,7 @@ import edu.wpi.first.wpilibj.VictorSP;	//Arm Motors
 import edu.wpi.first.wpilibj.Spark;		//Drive Motors
 import edu.wpi.first.wpilibj.Counter;
 import edu.wpi.first.wpilibj.AnalogGyro;
-import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.buttons.*;
+
 
 
 /**
@@ -45,12 +44,15 @@ public class Robot extends IterativeRobot {
 	int X;
 	int Y;
 	int Z;
-
+	
+	
+	boolean turnComplete = false;
 	double joystickPOV;
-	DigitalInput limitSwitch = new DigitalInput(0);
+	DigitalInput limitSwitch = new DigitalInput(1);
 	Counter counter = new Counter(limitSwitch);
 	boolean armUp;	
-
+	
+	
 	int session;
 	Image frame;
 
@@ -70,7 +72,7 @@ public class Robot extends IterativeRobot {
 	 */
 
 	private AnalogGyro gyro;
-	double Kp = 0.03;
+	double Kp = 0.000000000008;
 
 	public boolean isSwitchSet() {
 
@@ -84,11 +86,10 @@ public class Robot extends IterativeRobot {
 
 	public void robotInit() {
 
-		gyro = new AnalogGyro(0);
+		gyro = new AnalogGyro(1);
 		chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight); 
 		controlArmHeight = new RobotDrive(armHeight,armHeight);
 		controlArmTilt = new RobotDrive(armTilt,armTilt);
-
 
 		rightStick = new Joystick(0);
 		leftStick = new Joystick(1);
@@ -98,7 +99,7 @@ public class Robot extends IterativeRobot {
 		chassis.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
 		chassis.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
 		chassis.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);    	    	
-
+		chassis.setExpiration(0.1);
 		//vision
 		/*frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
 		// the camera name (ex "cam0") can be found through the roborio web interface
@@ -161,16 +162,16 @@ public class Robot extends IterativeRobot {
 	}*/
 
 	public void autonomousPeriodic() {
-
+		
 		//Only Run one obstacle at a time!
 
 		//autonomousRoughTerrain();
 		//autonomousRamparts();
-		//autonomousBoop();
+		autonomousBoop();
 		//autonomousPortCullis();
 		//autonomousLowBar();
 		//autonomousTurn90Left();
-		autonomousTurn90Right();
+		//autonomousTurn90Right();
 		//autonomousTurn180Left();
 		//autonomousTurn180Right();
 	}
@@ -178,18 +179,18 @@ public class Robot extends IterativeRobot {
 	private void autonomousBoop() {
 
 		double angle = gyro.getAngle();
-		gyro.reset();
+		
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 4) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.25, angle*Kp);
+		if(X < 50 * n * 8) {//based on this, 50n = ~n second    		
+			chassis.drive(-0.3, angle*Kp);
 			X++;
 		}
 	}
 	
-	private void autonomousPortCullis(){
+	private void autonomousPortCullis() {
 		double angle = gyro.getAngle();
-		gyro.reset();
+		
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);		
 		if(X < 50 * n * .5) {//based on this, 50n = ~n second
@@ -208,7 +209,7 @@ public class Robot extends IterativeRobot {
 	private void autonomousLowBar() {
 
 		double angle = gyro.getAngle();
-		gyro.reset();
+		
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
 		if(X < 50 * n * 3) {//based on this, 50n = ~n second    		
@@ -220,7 +221,7 @@ public class Robot extends IterativeRobot {
 	private void autonomousRoughTerrain() {
 
 		double angle = gyro.getAngle();
-		gyro.reset();
+		
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
 		if(X < 50 * n * 2.5) {//based on this, 50n = ~n second    		
@@ -241,11 +242,11 @@ public class Robot extends IterativeRobot {
 			X++;
 		}
     }*/
-
+	
 	private void autonomousRamparts() {//WARNING NOT CALIBRATED DO NOT USE
 
 		double angle = gyro.getAngle();
-		gyro.reset();
+		
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
 		if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
@@ -257,9 +258,9 @@ public class Robot extends IterativeRobot {
     
     private void autonomousTurn90Left() {
     	double angle = gyro.getAngle();
-    	gyro.reset();
+    	
     	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(angle == 270) {
+    	if( angle == 270) {
     		
     	}
     	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
@@ -284,36 +285,52 @@ public class Robot extends IterativeRobot {
     private void autonomousTurn90Right() {
     	
     	double angle = gyro.getAngle();
-    	gyro.reset();
+    	SmartDashboard.putDouble("Angle", angle);
     	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(angle == 90) {
-    		
-    	}
-    	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
-    		chassis.tankDrive(-0.15, 0.15);
+    	if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
+			chassis.drive(-0.25, 1);
 			//armTilt.set(-0.5);
 			X++;
     	}
-    	else if(angle >= 0 && angle <90){
-    		
-    		chassis.tankDrive(-0.15, 0.15);
+    	if(X >= 50 * n * 5 && X <= 50 *n * 10)
+    	{
+    		chassis.drive(-0.25, -1);
+    		X++;
     	}
-    	else if(angle > 90 && angle < 270) {
+    	/**if(angle >= 85 && angle <= 95) {
+    		turnComplete = true;
+    	}
+    	else if(angle > 270 && angle <= 360 && turnComplete == false ) {//based on this, 50n = ~n second    		
+    		//chassis.tankDrive(-0.15, 0.15);
+    		//chassis.drive(-.375, 1);
+    		chassis.drive(-.275, -1);
+			//armTilt.set(-0.5);
+			X++;
+    	}
+    	else if(angle >= 0 && angle <85 && turnComplete == false){
     		
-    		chassis.tankDrive(0.15, -0.15);
+    		//chassis.tankDrive(-0.15, 0.15);
+    		chassis.drive(-.275, -1);
+    		//chassis.drive(.375, -1);
+    	}
+    	else if(angle > 95 && angle < 270 && turnComplete == false) {
+    		
+    		//chassis.tankDrive(0.15, -0.15);
+    		chassis.drive(.275, 1);
+    		//chassis.drive(-.375, -1);
     	}
     	else {
     		
     		chassis.drive(0.0, 0.0);
-    	}
+    	}*/
     }
     
     private void autonomousTurn180() {
     	
     	double angle = gyro.getAngle();
-    	gyro.reset();
+    	
     	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(angle == 180) {
+    	if( angle == 180) {
     		
     	}
     	if(angle > 180 && angle <= 360 ) {//based on this, 50n = ~n second    		
@@ -335,7 +352,7 @@ public class Robot extends IterativeRobot {
 	 * This function is called once each time the robot enters tele-operated mode
 	 */
 	public void teleopInit() {
-
+		gyro.reset();
 	}
 
 	/**
@@ -349,19 +366,27 @@ public class Robot extends IterativeRobot {
 	 */
 
 	public void teleopPeriodic() {
-
+		double angle = gyro.getAngle();
+    	SmartDashboard.putDouble("Angle", angle);
 		armUp = isSwitchSet();
 		joystickPOV = rightStick.getPOV();
 
 		chassis.arcadeDrive(rightStick, true);
 
-		if(rightStick.getRawButton(3)) {
+		if(rightStick.getRawButton(3) && armUp != true) {
 			armHeight.set(-0.40);
+			
 		}
+		
 
 		if(rightStick.getRawButton(5)){
-			armHeight.set(0.3);        		
+			armHeight.set(0.3);    
+			initializeCounter();
 		}
+		else if(armUp == true) {
+			armHeight.set(-.05);
+		}
+		
 		
 		if(rightStick.getRawButton(11)) {
 			
