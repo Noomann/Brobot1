@@ -35,8 +35,7 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 public class Robot extends IterativeRobot {
 
 	RobotDrive chassis;// = new RobotDrive(0,1);
-	RobotDrive controlArmHeight;
-	RobotDrive controlArmTilt;
+	RobotDrive controlArm;
 	Joystick rightStick;// = new Joystick(0);
 	Joystick leftStick;// = new Joystick(1);
 
@@ -47,10 +46,12 @@ public class Robot extends IterativeRobot {
 	
 	
 	boolean turnComplete = false;
-	double joystickPOV;
-	DigitalInput limitSwitch = new DigitalInput(1);
-	Counter counter = new Counter(limitSwitch);
+	DigitalInput limitSwitch1 = new DigitalInput(0);
+	DigitalInput limitSwitch2 = new DigitalInput(1);
+	Counter counter1 = new Counter(limitSwitch1);
+	Counter counter2 = new Counter(limitSwitch2);
 	boolean armUp;	
+	boolean armDown;
 	
 	
 	int session;
@@ -63,8 +64,7 @@ public class Robot extends IterativeRobot {
 	Spark rearLeft = new Spark(3);		// Left Rear			
 
 	//Arm Motors
-	VictorSP armHeight = new VictorSP(4);	// Arm Height
-	VictorSP armTilt = new VictorSP(5);		// Arm Tilt
+	VictorSP arm = new VictorSP(4);	// Arm Control
 
 	/**
 	 * This function is run when the robot is first started up and should be
@@ -74,22 +74,29 @@ public class Robot extends IterativeRobot {
 	private AnalogGyro gyro;
 	double Kp = 0.000000000008;
 
-	public boolean isSwitchSet() {
+	public boolean isSwitchSet1() {
 
-		return counter.get() > 0;		
+		return counter1.get() > 0;	
+	}
+	
+	public boolean isSwitchSet2() {
+		return counter2.get() > 0;
 	}
 
-	public void initializeCounter() {
+	public void initializeCounter1() {
 
-		counter.reset();
+		counter1.reset();
+	}
+	
+	public void initializeCounter2() {
+		
+		counter2.reset();
 	}
 
 	public void robotInit() {
 
 		gyro = new AnalogGyro(1);
-		chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight); 
-		controlArmHeight = new RobotDrive(armHeight,armHeight);
-		controlArmTilt = new RobotDrive(armTilt,armTilt);
+		chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight);
 
 		rightStick = new Joystick(0);
 		leftStick = new Joystick(1);
@@ -164,12 +171,9 @@ public class Robot extends IterativeRobot {
 
 	public void autonomousPeriodic() {
 		
-<<<<<<< HEAD
-		double angle = gyro.getAngle();
+
     	gyro.reset();
 
-=======
->>>>>>> refs/remotes/origin/gyro-stuff
 		//Only Run one obstacle at a time!
 
 		//autonomousRoughTerrain();
@@ -201,14 +205,14 @@ public class Robot extends IterativeRobot {
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);		
 		if(X < 50 * n * .5) {//based on this, 50n = ~n second
-			armHeight.set(.4);
+			arm.set(.4);
 			//chassis.drive(-0.25, angle*Kp);
 			X++;
 		} else if (Y < 50 * n * 4){
 			chassis.drive(-.35, angle*Kp);
 			Y++;
 		} else if (Z < 50 * n * .5){
-			armHeight.set(-.4);
+			arm.set(-.4);
 			Z++;
 		}
 	}
@@ -294,7 +298,6 @@ public class Robot extends IterativeRobot {
     	
     	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
     	double angle = gyro.getAngle();
-<<<<<<< HEAD
     	gyro.reset();
     	if(angle == 90) {
     		
@@ -303,7 +306,7 @@ public class Robot extends IterativeRobot {
     		//chassis.tankDrive(-0.15, 0.15);
     		chassis.drive(-0.375, 1);
     		chassis.drive(0.375, -1);
-=======
+    	}    	
     	SmartDashboard.putDouble("Angle", angle);
     	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
     	if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
@@ -325,32 +328,25 @@ public class Robot extends IterativeRobot {
     		chassis.drive(-.275, -1);
 			//armTilt.set(-0.5);
 			X++;
->>>>>>> refs/remotes/origin/gyro-stuff
     	}
     	else if(angle >= 0 && angle <85 && turnComplete == false){
     		
     		//chassis.tankDrive(-0.15, 0.15);
-<<<<<<< HEAD
     		chassis.drive(-0.375, 1);
     		chassis.drive(0.375, -1);
-=======
     		chassis.drive(-.275, -1);
     		//chassis.drive(.375, -1);
->>>>>>> refs/remotes/origin/gyro-stuff
     	}
     	else if(angle > 95 && angle < 270 && turnComplete == false) {
     		
     		//chassis.tankDrive(0.15, -0.15);
-<<<<<<< HEAD
     		chassis.drive(-0.375, -1);
     		chassis.drive(0.375, 1);
     	} else {
-=======
     		chassis.drive(.275, 1);
     		//chassis.drive(-.375, -1);
     	}
     	else {
->>>>>>> refs/remotes/origin/gyro-stuff
     		
     		chassis.drive(0.0, 0.0);
     	}*/
@@ -399,86 +395,27 @@ public class Robot extends IterativeRobot {
 	public void teleopPeriodic() {
 		double angle = gyro.getAngle();
     	SmartDashboard.putDouble("Angle", angle);
-		armUp = isSwitchSet();
-		joystickPOV = rightStick.getPOV();
+		armUp = isSwitchSet1();
+		armDown = isSwitchSet2();
 
 		chassis.arcadeDrive(rightStick, true);
 
 		if(rightStick.getRawButton(3) && armUp != true) {
-			armHeight.set(-0.40);
-			
+			arm.set(-0.40);
+			initializeCounter2();			
+		} else if (armDown==true){
+			arm.set(0.0);
+			initializeCounter2();
 		}
 		
 
-		if(rightStick.getRawButton(5)){
-<<<<<<< HEAD
-			armHeight.set(0.3);
-			initializeCounter();
+		if(rightStick.getRawButton(5) && armDown != true){
+			arm.set(0.3);
+			initializeCounter1();
 		} else if (armUp==true){
-			armTilt.set(0);
-=======
-			armHeight.set(0.3);    
-			initializeCounter();
-		}
-		else if(armUp == true) {
-			armHeight.set(-.05);
->>>>>>> refs/remotes/origin/gyro-stuff
-		}
-		
-		
-		if(rightStick.getRawButton(11)) {
-			
-			//autonomousRoughTerrain();
-			//autonomousRamparts();
-			//autonomousBoop();
-			//autonomousPortCullis();
-			//autonomousLowBar();
-			//autonomousTurn90Left();
-			autonomousTurn90Right();
-			//autonomousTurn180Left();
-			//autonomousTurn180Right();
-		}
-
-		if(joystickPOV == 0.0)//not functioning
-		{
-			chassis.arcadeDrive(-0.25, 0.0);
-		}
-
-		if(joystickPOV == 45.0)
-		{
-			chassis.arcadeDrive(-0.15, 45.0);
-		}
-
-		if(joystickPOV == 90.0)//not functioning
-		{
-			chassis.arcadeDrive(-0.25, 45.0);
-		}
-
-		if(joystickPOV == 135.0)
-		{
-			chassis.arcadeDrive(0.15, -45.0);
-		}
-
-		if(joystickPOV == 180.0)//not functioning
-		{
-			chassis.arcadeDrive(0.25, 0.0);
-		}
-
-		if(joystickPOV == 225.0)
-		{
-			chassis.arcadeDrive(0.15, 45.0);
-		}
-
-		if(joystickPOV == 270.0) {//not functioning{
-
-			chassis.arcadeDrive(0.25, 45.0);
-		}
-
-		if(joystickPOV == 315.0) {
-
-			chassis.arcadeDrive(-0.15, -45.0);
-		}  
-
+			arm.set(0.0);    
+			initializeCounter1();
+		}		 
 	}
 
 	/**
