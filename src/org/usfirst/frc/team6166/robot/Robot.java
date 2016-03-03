@@ -181,6 +181,7 @@ public class Robot extends IterativeRobot {
 		autonomousBoop();
 		//autonomousPortCullis();
 		//autonomousLowBar();
+		//autonomousShovelTheFries();
 		//autonomousTurn90Left();
 		//autonomousTurn90Right();
 		//autonomousTurn180Left();
@@ -227,6 +228,10 @@ public class Robot extends IterativeRobot {
 			chassis.drive(-0.3, angle*Kp);
 			X++;
 		}
+		if (Y < 50 * n * 3) {
+			chassis.drive(-0.3, angle*Kp);
+			Y++;
+		}
 	}
 
 	private void autonomousRoughTerrain() {
@@ -266,6 +271,13 @@ public class Robot extends IterativeRobot {
 			X++;
     	}
     }
+	
+	private void autonomousShovelTheFries() {
+		double angle = gyro.getAngle();	
+		if(X < 50 * n * 5) {
+			chassis.drive(-.25, angle*Kp);
+		}
+	}
     
     private void autonomousTurn90Left() {
     	double angle = gyro.getAngle();
