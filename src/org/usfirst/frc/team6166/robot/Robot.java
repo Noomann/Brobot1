@@ -46,12 +46,17 @@ public class Robot extends IterativeRobot {
 	
 	
 	boolean turnComplete = false;
-	DigitalInput limitSwitch1 = new DigitalInput(0);
-	DigitalInput limitSwitch2 = new DigitalInput(1);
-	Counter counter1 = new Counter(limitSwitch1);
-	Counter counter2 = new Counter(limitSwitch2);
 	boolean armUp;	
 	boolean armDown;
+	boolean autonomousTask1;
+	
+	DigitalInput limitSwitch1 = new DigitalInput(0);
+	DigitalInput limitSwitch2 = new DigitalInput(1);
+	
+	Counter counter1 = new Counter(limitSwitch1);
+	Counter counter2 = new Counter(limitSwitch2);
+	
+	
 	
 	
 	int session;
@@ -131,6 +136,7 @@ public class Robot extends IterativeRobot {
 		X = 0;
 		Y = 0;
 		Z = 0;
+		autonomousTask1 = false;
 		
 
 	}
@@ -178,7 +184,7 @@ public class Robot extends IterativeRobot {
 
 		//autonomousRoughTerrain();
 		//autonomousRamparts();
-		autonomousBoop();
+		autonomousStraight();
 		//autonomousPortCullis();
 		//autonomousLowBar();
 		//autonomousShovelTheFries();
@@ -188,7 +194,7 @@ public class Robot extends IterativeRobot {
 		//autonomousTurn180Right();
 	}
 
-	private void autonomousBoop() {
+	private void autonomousStraight() {
 
 		double angle = gyro.getAngle();
 		
@@ -274,9 +280,40 @@ public class Robot extends IterativeRobot {
 	
 	private void autonomousShovelTheFries() {
 		double angle = gyro.getAngle();	
+		armUp = isSwitchSet1();
+		armDown = isSwitchSet2();
 		if(X < 50 * n * 5) {
 			chassis.drive(-.25, angle*Kp);
 		}
+		else if(X >= 50 * n * 5 && autonomousTask1 != true) {
+			if(armDown != true){
+				arm.set(0.3);
+				initializeCounter1();
+			} else if (armDown == true){
+				arm.set(0.0);
+				autonomousTask1 = true;
+				initializeCounter1();
+			}
+		}
+		else if(Y <50 * n * 1) {
+			chassis.drive(-.25, angle*Kp);
+			Y++;
+		}
+		else if(Z < 50 * n * 3) {
+			if(armUp != true) {
+				arm.set(-0.3);
+				chassis.drive(-.25, angle*Kp);
+				initializeCounter1();
+				Z++;
+			}
+			else if(armUp == true) {
+				arm.set(0.0);
+				chassis.drive(-.25, angle*Kp);
+				initializeCounter1();
+				Z++;
+			}
+		}
+		
 	}
     
     private void autonomousTurn90Left() {
