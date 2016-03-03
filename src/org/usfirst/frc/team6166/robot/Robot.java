@@ -184,9 +184,9 @@ public class Robot extends IterativeRobot {
 
 		//autonomousRoughTerrain();
 		//autonomousRamparts();
-		autonomousStraight();
+		//autonomousStraight();
 		//autonomousPortCullis();
-		//autonomousLowBar();
+		autonomousLowBar();
 		//autonomousShovelTheFries();
 		//autonomousTurn90Left();
 		//autonomousTurn90Right();
