@@ -77,7 +77,7 @@ public class Robot extends IterativeRobot {
 	 */
 
 	private AnalogGyro gyro;
-	double Kp = 0.000000000008;
+	double Kp = 0.000000000008;//delete 0 zero(s) to revert
 
 	public boolean isSwitchSet1() {
 
@@ -125,9 +125,6 @@ public class Robot extends IterativeRobot {
 	/**
 	 * This function is run once each time the robot enters autonomous mode
 	 */
-
-
-
 	public void autonomousInit() {
 
 		gyro.reset();
@@ -144,50 +141,25 @@ public class Robot extends IterativeRobot {
 	/**
 	 * This function is called periodically during autonomous
 	 */
-	/*private void autonomousExample() {
-
-		double angle = gyro.getAngle();
-		gyro.reset();
-
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);    	
-		if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.25, angle*Kp);
-			//armTilt.set(-0.5);
-			X++;
-		} else if (Y < 50 * n) {
-
-			//chassis.drive(-0.25, 0.0);  // drive forwards half speed (- is forward, + backward) (-0.5,0))
-			//armHeight.set(-0.5);
-			Y++;
-		} else if (Y < 50 * n * 2) {
-
-			//chassis.drive(0.0, 0.0);					
-			//armHeight.set(-0.5);
-			Y++;
-		} else if (Z < 50 * n * .5) {
-
-			//armTilt.set(0.125);
-			//armHeight.set(0.125);
-			Z++;
-		} else {
-
-			chassis.drive(0.0, 0.0); 	// stop robot
-		}
-	}*/
-
 	public void autonomousPeriodic() {
 		
 
     	gyro.reset();
-
+    	
 		//Only Run one obstacle at a time!
-
+    	
+    	//Calibrated:
+    	
 		//autonomousRoughTerrain();
-		//autonomousRamparts();
 		//autonomousStraight();
 		//autonomousPortCullis();
-		autonomousLowBar();
+		//autonomousLowBar();
+    	
+    	//Not Calibrated:
+    	
+    	//autonomousMoat();
 		//autonomousShovelTheFries();
+		//autonomousRamparts();
 		//autonomousTurn90Left();
 		//autonomousTurn90Right();
 		//autonomousTurn180Left();
@@ -200,8 +172,17 @@ public class Robot extends IterativeRobot {
 		
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 8) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.3, angle*Kp);
+		if(X < 50 * n * 1.5) {//based on this, 50n = ~n second    		
+			chassis.drive(-0.4, angle*Kp);
+			X++;
+		}
+	}
+	
+	private void autonomousMoat() {
+		double angle = gyro.getAngle();
+		
+		if(X < 50 * n * 2) {
+			chassis.drive(-.5, angle*Kp);
 			X++;
 		}
 	}
@@ -212,14 +193,14 @@ public class Robot extends IterativeRobot {
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);		
 		if(X < 50 * n * .5) {//based on this, 50n = ~n second
-			arm.set(.4);
+			arm.set(.3);
 			//chassis.drive(-0.25, angle*Kp);
 			X++;
-		} else if (Y < 50 * n * 4){
+		} else if (Y < 50 * n * 3){
 			chassis.drive(-.35, angle*Kp);
 			Y++;
 		} else if (Z < 50 * n * .5){
-			arm.set(-.4);
+			arm.set(-.3);
 			Z++;
 		}
 	}
@@ -230,14 +211,13 @@ public class Robot extends IterativeRobot {
 		
 
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 3) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.3, angle*Kp);
+		if(X < 50 * n * 2) {//based on this, 50n = ~n second    		
+			chassis.drive(-0.4, angle*Kp);
 			X++;
-		}
-		if (Y < 50 * n * 3) {
-			chassis.drive(-0.3, angle*Kp);
+		}/* else if (Y < 50 * n * 2) {
+			chassis.drive(0.4, angle*Kp);
 			Y++;
-		}
+		} */
 	}
 
 	private void autonomousRoughTerrain() {
@@ -251,21 +231,8 @@ public class Robot extends IterativeRobot {
 			X++;
 		}
 	}
-
-	/*private void autonomousMoat() {//WARNING NOT CALIBRATED DO NOT USE
-
-    	double angle = gyro.getAngle();
-    	gyro.reset();
-
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(X < 50 * n * 2) {//based on this, 50n = ~n second    		
-    		chassis.drive(-0.4, angle*Kp);
-			//armTilt.set(-0.5);
-			X++;
-		}
-    }*/
 	
-	private void autonomousRamparts() {//WARNING NOT CALIBRATED DO NOT USE
+	private void autonomousRamparts() {
 
 		double angle = gyro.getAngle();
 		
@@ -282,11 +249,13 @@ public class Robot extends IterativeRobot {
 		double angle = gyro.getAngle();	
 		armUp = isSwitchSet1();
 		armDown = isSwitchSet2();
-		if(X < 50 * n * 5) {
+		if(X < 50 * n * 1.7) {
 			chassis.drive(-.25, angle*Kp);
+			X++;
 		}
-		else if(X >= 50 * n * 5 && autonomousTask1 != true) {
+		else if(X == 50 * n * 1.7 && autonomousTask1 != true) {
 			if(armDown != true){
+				chassis.drive(0.0, angle*Kp);
 				arm.set(0.3);
 				initializeCounter1();
 			} else if (armDown == true){
@@ -299,20 +268,35 @@ public class Robot extends IterativeRobot {
 			chassis.drive(-.25, angle*Kp);
 			Y++;
 		}
-		else if(Z < 50 * n * 3) {
+	 	else if(Z < 50 * n * 3) {
 			if(armUp != true) {
 				arm.set(-0.3);
 				chassis.drive(-.25, angle*Kp);
 				initializeCounter1();
 				Z++;
-			}
-			else if(armUp == true) {
+			} else if(armUp == true) {
 				arm.set(0.0);
 				chassis.drive(-.25, angle*Kp);
 				initializeCounter1();
 				Z++;
 			}
 		}
+		/*if(rightStick.getRawButton(3) && armUp != true) {
+			arm.set(-0.30);
+			initializeCounter2();			
+		} else if (armDown==true){
+			arm.set(0.0);
+			initializeCounter2();
+		}
+		
+
+		if(rightStick.getRawButton(5) && armDown != true){
+			arm.set(0.3);
+			initializeCounter1();
+		} else if (armUp==true){
+			arm.set(0.0);    
+			initializeCounter1();
+		}*/		 
 		
 	}
     
@@ -450,7 +434,7 @@ public class Robot extends IterativeRobot {
 		chassis.arcadeDrive(rightStick, true);
 
 		if(rightStick.getRawButton(3) && armUp != true) {
-			arm.set(-0.40);
+			arm.set(-0.30);
 			initializeCounter2();			
 		} else if (armDown==true){
 			arm.set(0.0);
@@ -473,5 +457,4 @@ public class Robot extends IterativeRobot {
 	public void testPeriodic() {
 		LiveWindow.run();
 	}
-
 }
