@@ -43,7 +43,10 @@ public class Robot extends IterativeRobot {
 	int X;
 	int Y;
 	int Z;
-	
+	int Q;
+	int W;
+	int V;
+	int I;
 	
 	boolean turnComplete = false;
 	boolean armUp;	
@@ -133,9 +136,12 @@ public class Robot extends IterativeRobot {
 		X = 0;
 		Y = 0;
 		Z = 0;
+		Q = 0;
+		W = 0;
+		V = 0;
+		I = 0;
 		autonomousTask1 = false;
 		
-
 	}
 
 	/**
@@ -153,12 +159,15 @@ public class Robot extends IterativeRobot {
 		//autonomousRoughTerrain();
 		//autonomousStraight();
 		//autonomousPortCullis();
-		//autonomousLowBar();
+		autonomousLowBar();
+    	
+    	//Calibrated But Not Tested:
+    	
+    	//autonomousShovelTheFries();
     	
     	//Not Calibrated:
     	
     	//autonomousMoat();
-		//autonomousShovelTheFries();
 		//autonomousRamparts();
 		//autonomousTurn90Left();
 		//autonomousTurn90Right();
@@ -235,9 +244,7 @@ public class Robot extends IterativeRobot {
 	private void autonomousRamparts() {
 
 		double angle = gyro.getAngle();
-		
 
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
 		if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
 			chassis.drive(-0.25, angle*Kp);
 			//armTilt.set(-0.5);
@@ -246,40 +253,30 @@ public class Robot extends IterativeRobot {
     }
 	
 	private void autonomousShovelTheFries() {
-		double angle = gyro.getAngle();	
-		armUp = isSwitchSet1();
-		armDown = isSwitchSet2();
-		if(X < 50 * n * 1.7) {
-			chassis.drive(-.25, angle*Kp);
+		double angle = gyro.getAngle();
+		
+		if (X < 50 * n * 1.5) {
+			chassis.drive(-.25, angle * Kp);
 			X++;
-		}
-		else if(X == 50 * n * 1.7 && autonomousTask1 != true) {
-			if(armDown != true){
-				chassis.drive(0.0, angle*Kp);
-				arm.set(0.3);
-				initializeCounter1();
-			} else if (armDown == true){
-				arm.set(0.0);
-				autonomousTask1 = true;
-				initializeCounter1();
-			}
-		}
-		else if(Y <50 * n * 1) {
-			chassis.drive(-.25, angle*Kp);
+		} else if(Y < 50 * n * .2) {
+			chassis.drive(0.0, angle * Kp);
+			arm.set(0.25);
 			Y++;
-		}
-	 	else if(Z < 50 * n * 3) {
-			if(armUp != true) {
-				arm.set(-0.3);
-				chassis.drive(-.25, angle*Kp);
-				initializeCounter1();
-				Z++;
-			} else if(armUp == true) {
-				arm.set(0.0);
-				chassis.drive(-.25, angle*Kp);
-				initializeCounter1();
-				Z++;
-			}
+		} else if (V < 50 * n * .5) {
+			chassis.drive(0.0, angle * Kp);	
+			V++;
+		} else if (Z < 50 * n * .2) {
+			chassis.drive(-0.25, angle * Kp);
+			Z++;
+		} else if (Q < 50 * n * .2) {
+			chassis.drive(-0.35, angle * Kp);
+			Q++;
+		} else if (W < 50 * n * 1) {
+			chassis.drive(-0.35, angle * Kp);
+			W++;
+		} else if (I < 50 * n * .1) {
+			arm.set(-0.25);
+			I++;
 		}
 		/*if(rightStick.getRawButton(3) && armUp != true) {
 			arm.set(-0.30);
