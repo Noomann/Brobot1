@@ -34,19 +34,19 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 
 public class Robot extends IterativeRobot {
 
-	RobotDrive chassis;// = new RobotDrive(0,1);
+	public static RobotDrive chassis;// = new RobotDrive(0,1);
 	RobotDrive controlArm;
 	Joystick rightStick;// = new Joystick(0);
 	Joystick leftStick;// = new Joystick(1);
 
-	int n;
-	int X;
-	int Y;
-	int Z;
-	int Q;
-	int W;
-	int V;
-	int I;
+	public static int n;
+	public static int X;
+	public static int Y;
+	public static int Z;
+	public static int Q;
+	public static int W;
+	public static int V;
+	public static int I;
 	
 	boolean turnComplete = false;
 	boolean armUp;	
@@ -72,15 +72,15 @@ public class Robot extends IterativeRobot {
 	Spark rearLeft = new Spark(3);		// Left Rear			
 
 	//Arm Motors
-	VictorSP arm = new VictorSP(4);	// Arm Control
+	static VictorSP arm = new VictorSP(4);	// Arm Control
 
 	/**
 	 * This function is run when the robot is first started up and should be
 	 * used for any initialization code.
 	 */
 
-	private AnalogGyro gyro;
-	double Kp = 0.000000000008;//delete 0 zero(s) to revert
+	public static AnalogGyro gyro;
+	public static double Kp = 0.000000000008;//delete 0 zero(s) to revert
 
 	public boolean isSwitchSet1() {
 
@@ -158,7 +158,7 @@ public class Robot extends IterativeRobot {
     	
 		//autonomousRoughTerrain();
 		//autonomousStraight();
-		autonomousPortCullis();
+		Autonomous.PortCullis();
 		//autonomousLowBar();
     	
     	//Calibrated But Not Tested:
@@ -175,235 +175,7 @@ public class Robot extends IterativeRobot {
 		//autonomousTurn180Right();
 	}
 
-	private void autonomousStraight() {
-
-		double angle = gyro.getAngle();
-		
-
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 1.5) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.4, angle*Kp);
-			X++;
-		}
-	}
 	
-	private void autonomousMoat() {
-		double angle = gyro.getAngle();
-		
-		if(X < 50 * n * 2) {
-			chassis.drive(-.5, angle*Kp);
-			X++;
-		}
-	}
-	
-	private void autonomousPortCullis() {
-		double angle = gyro.getAngle();
-		
-
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);		
-		if(X < 50 * n * .5) {//based on this, 50n = ~n second
-			arm.set(.3);
-			//chassis.drive(-0.25, angle*Kp);
-			X++;
-		} else if (Y < 50 * n * 3){
-			chassis.drive(-.35, angle*Kp);
-			Y++;
-		} else if (Z < 50 * n * .5){
-			arm.set(-.3);
-			Z++;
-		}
-	}
-
-	private void autonomousLowBar() {
-
-		double angle = gyro.getAngle();
-		
-
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 2) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.4, angle*Kp);
-			X++;
-		}/* else if (Y < 50 * n * 2) {
-			chassis.drive(0.4, angle*Kp);
-			Y++;
-		} */
-	}
-
-	private void autonomousRoughTerrain() {
-
-		double angle = gyro.getAngle();
-		
-
-		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-		if(X < 50 * n * 2.5) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.4, angle*Kp);
-			X++;
-		}
-	}
-	
-	private void autonomousRamparts() {
-
-		double angle = gyro.getAngle();
-
-		if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.25, angle*Kp);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    }
-	
-	private void autonomousShovelTheFries() {
-		double angle = gyro.getAngle();
-		
-		if (X < 50 * n * 1.5) {
-			chassis.drive(-.25, angle * Kp);
-			X++;
-		} else if(Y < 50 * n * .2) {
-			chassis.drive(0.0, angle * Kp);
-			arm.set(0.25);
-			Y++;
-		} else if (V < 50 * n * .5) {
-			chassis.drive(0.0, angle * Kp);	
-			V++;
-		} else if (Z < 50 * n * .2) {
-			chassis.drive(-0.25, angle * Kp);
-			Z++;
-		} else if (Q < 50 * n * .2) {
-			chassis.drive(-0.35, angle * Kp);
-			Q++;
-		} else if (W < 50 * n * 1) {
-			chassis.drive(-0.35, angle * Kp);
-			W++;
-		} else if (I < 50 * n * .1) {
-			arm.set(-0.25);
-			I++;
-		}
-		/*if(rightStick.getRawButton(3) && armUp != true) {
-			arm.set(-0.30);
-			initializeCounter2();			
-		} else if (armDown==true){
-			arm.set(0.0);
-			initializeCounter2();
-		}
-		
-
-		if(rightStick.getRawButton(5) && armDown != true){
-			arm.set(0.3);
-			initializeCounter1();
-		} else if (armUp==true){
-			arm.set(0.0);    
-			initializeCounter1();
-		}*/		 
-		
-	}
-    
-    private void autonomousTurn90Left() {
-    	double angle = gyro.getAngle();
-    	
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if( angle == 270) {
-    		
-    	}
-    	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
-    		chassis.tankDrive(0.15, -0.15);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    	else if(angle >= 0 && angle <=90){
-    		
-    		chassis.tankDrive(0.15, -0.15);
-    	}
-    	else if(angle > 90 && angle < 270) {
-    		
-    		chassis.tankDrive(-0.15, 0.15);
-    	}
-    	else {
-    		
-    		chassis.drive(0.0, 0.0);
-    	}
-    }
-    
-    private void autonomousTurn90Right() {
-    	
-    	
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	double angle = gyro.getAngle();
-    	gyro.reset();
-    	if(angle == 90) {
-    		
-    	}
-    	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
-    		//chassis.tankDrive(-0.15, 0.15);
-    		chassis.drive(-0.375, 1);
-    		chassis.drive(0.375, -1);
-    	}    	
-    	SmartDashboard.putDouble("Angle", angle);
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.25, 1);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    	if(X >= 50 * n * 5 && X <= 50 *n * 10)
-    	{
-    		chassis.drive(-0.25, -1);
-    		X++;
-    	}
-    	/**if(angle >= 85 && angle <= 95) {
-    		turnComplete = true;
-    	}
-    	else if(angle > 270 && angle <= 360 && turnComplete == false ) {//based on this, 50n = ~n second    		
-    		//chassis.tankDrive(-0.15, 0.15);
-    		//chassis.drive(-.375, 1);
-    		chassis.drive(-.275, -1);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    	else if(angle >= 0 && angle <85 && turnComplete == false){
-    		
-    		//chassis.tankDrive(-0.15, 0.15);
-    		chassis.drive(-0.375, 1);
-    		chassis.drive(0.375, -1);
-    		chassis.drive(-.275, -1);
-    		//chassis.drive(.375, -1);
-    	}
-    	else if(angle > 95 && angle < 270 && turnComplete == false) {
-    		
-    		//chassis.tankDrive(0.15, -0.15);
-    		chassis.drive(-0.375, -1);
-    		chassis.drive(0.375, 1);
-    	} else {
-    		chassis.drive(.275, 1);
-    		//chassis.drive(-.375, -1);
-    	}
-    	else {
-    		
-    		chassis.drive(0.0, 0.0);
-    	}*/
-    }
-    
-    private void autonomousTurn180() {
-    	
-    	double angle = gyro.getAngle();
-    	
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if( angle == 180) {
-    		
-    	}
-    	if(angle > 180 && angle <= 360 ) {//based on this, 50n = ~n second    		
-    		chassis.tankDrive(0.15, -0.15);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    	else if(angle >= 0 && angle < 180){
-    		
-    		chassis.tankDrive(-0.15, 0.15);
-    	}
-    	else {
-    		
-    		chassis.drive(0.0, 0.0);
-    	}
-	}
 
 	/**
 	 * This function is called once each time the robot enters tele-operated mode
