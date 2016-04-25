@@ -158,8 +158,8 @@ public class Robot extends IterativeRobot {
     	
 		//autonomousRoughTerrain();
 		//autonomousStraight();
-		//autonomousPortCullis();
-		autonomousLowBar();
+		autonomousPortCullis();
+		//autonomousLowBar();
     	
     	//Calibrated But Not Tested:
     	
