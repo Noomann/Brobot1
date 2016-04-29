@@ -165,9 +165,8 @@ public class Robot extends IterativeRobot {
     	//autonomousMoat();    	
     	//autonomousShovelTheFries();
     	
-    	//Not Calibrated:
-    	
-    	//autonomousMoat();
+    	//Not even a little bit:
+    	    	
 		//autonomousRamparts();
 		//autonomousTurn90Left();
 		//autonomousTurn90Right();
