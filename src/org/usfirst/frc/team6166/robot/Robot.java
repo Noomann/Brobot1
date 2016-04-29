@@ -158,15 +158,15 @@ public class Robot extends IterativeRobot {
     	
 		//autonomousRoughTerrain();
 		//autonomousStraight();
-		autonomousPortCullis();
-		//autonomousLowBar();
+		//autonomousPortCullis();
+		autonomousLowBar();
     	
     	//Iffy, not used in practice/qualifier yet:
     	//autonomousMoat();    	
     	//autonomousShovelTheFries();
-    	
+		
     	//Not even a little bit:
-    	    	
+		
 		//autonomousRamparts();
 		//autonomousTurn90Left();
 		//autonomousTurn90Right();
