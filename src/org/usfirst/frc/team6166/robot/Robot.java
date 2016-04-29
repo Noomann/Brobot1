@@ -161,8 +161,8 @@ public class Robot extends IterativeRobot {
 		autonomousPortCullis();
 		//autonomousLowBar();
     	
-    	//Calibrated But Not Tested:
-    	
+    	//Iffy, not used in practice/qualifier yet:
+    	//autonomousMoat();    	
     	//autonomousShovelTheFries();
     	
     	//Not Calibrated:
@@ -179,7 +179,6 @@ public class Robot extends IterativeRobot {
 
 		double angle = gyro.getAngle();
 		
-
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
 		if(X < 50 * n * 1.5) {//based on this, 50n = ~n second    		
 			chassis.drive(-0.4, angle*Kp);
@@ -255,27 +254,27 @@ public class Robot extends IterativeRobot {
 	private void autonomousShovelTheFries() {
 		double angle = gyro.getAngle();
 		
-		if (X < 50 * n * 1.5) {
+		if (X < 50 * n * 2.015) {				//previously n * 2.015, 2.03, 2.0, 2.05, 1.85 1.75, 1.7, 1.5
 			chassis.drive(-.25, angle * Kp);
 			X++;
 		} else if(Y < 50 * n * .2) {
-			chassis.drive(0.0, angle * Kp);
+			chassis.drive(0.0, angle * Kp);		//stops robot, lowers arm
 			arm.set(0.25);
 			Y++;
 		} else if (V < 50 * n * .5) {
-			chassis.drive(0.0, angle * Kp);	
+			chassis.drive(0.0, angle * Kp);		//stops robot and arm movement
 			V++;
-		} else if (Z < 50 * n * .2) {
-			chassis.drive(-0.25, angle * Kp);
+		} else if (Z < 50 * n * .6) {
+			chassis.drive(-0.75, angle * Kp); 	//Power to climb over chevalt de fries, previously -.5, -.25
 			Z++;
 		} else if (Q < 50 * n * .2) {
-			chassis.drive(-0.35, angle * Kp);
+			chassis.drive(-0.35, angle * Kp);	//drives robot over chevalt
 			Q++;
 		} else if (W < 50 * n * 1) {
 			chassis.drive(-0.35, angle * Kp);
 			W++;
 		} else if (I < 50 * n * .1) {
-			arm.set(-0.25);
+			arm.set(-0.25);						//brings arm up
 			I++;
 		}
 		/*if(rightStick.getRawButton(3) && armUp != true) {
@@ -418,7 +417,7 @@ public class Robot extends IterativeRobot {
 	 * @see edu.wpi.first.wpilibj.IterativeRobot#teleopPeriodic()
 	 * @param
 	 * @author Holmen Robotics
-	 * @version 2/5/2016
+	 * @version 4/28/2016
 	 *   
 	 */
 
