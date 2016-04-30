@@ -19,17 +19,66 @@ import edu.wpi.first.wpilibj.AnalogGyro;
 
 
 /**
- * MOTOR PORT INFORMATION
+ ************************************************** NOTES **************************************************
+ *                                          MOTOR PORT INFORMATION                                         
+ *                                                                                                         
+ *           Number    :            Motor             -      Controller type     -      Color              
+ *       ============================================================================================      
+ *       =                                       Drive Train                                        =      
+ *       =     0       :         right front          -  Spark motor controller  -       RED        =      
+ *       =     1       :         right rear           -  Spark motor controller  -       RED        =      
+ *       =     2       :          left front          -  Spark motor controller  -      BLACK       =      
+ *       =     3       :          left rear           -  Spark motor controller  -      BLACK       =      
+ *       =                                                                                          =      
+ *       =     4       :           arm control        -  Victor motor controller -      BLACK       =      
+ *       ============================================================================================      
+ *                                                                                                          
+ *                                            CODE WE DIDN'T USE
+ *                        Category     -           Function             -     Reason                                                                              
+ *       
+ *                          Vision     -      Shape in camera view      -     Didn't help us accomplish our tasks any better
  * 
- * 0: right front - Spark motor controller - RED
- * 1: right rear - Spark motor controller - RED
+ * frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
+ * the camera name (ex "cam0") can be found through the roborio web interface
+ * session = NIVision.IMAQdxOpenCamera("cam0", NIVision.IMAQdxCameraControlMode.CameraControlModeController);
+ * NIVision.IMAQdxConfigureGrab(session);
+ * NIVision.IMAQdxGrab(session, frame, 1);
  * 
- * 2: left front - Spark motor controller - BLACK
- * 3: left rear - Spark motor controller - BLACK
+ *                         Driving     -      Gyroscopic Turning        -     Gyroscope not functioning as we imagined
+ *  
+ *  if(angle >= 85 && angle <= 95) {
+ *   		turnComplete = true;
+ *   	}
+ *   	else if(angle > 270 && angle <= 360 && turnComplete == false ) {//based on this, 50n = ~n second    		
+ *   		//chassis.tankDrive(-0.15, 0.15);
+ *   		//chassis.drive(-.375, 1);
+ *   		chassis.drive(-.275, -1);
+ *			//armTilt.set(-0.5);
+ *			X++;
+ *   	}
+ *   	else if(angle >= 0 && angle <85 && turnComplete == false){
+ *   		
+ *   		//chassis.tankDrive(-0.15, 0.15);
+ *   		chassis.drive(-0.375, 1);
+ *   		chassis.drive(0.375, -1);
+ *   		chassis.drive(-.275, -1);
+ *   		//chassis.drive(.375, -1);
+ *   	}
+ *   	else if(angle > 95 && angle < 270 && turnComplete == false) {
+ *   		
+ *   		//chassis.tankDrive(0.15, -0.15);
+ *   		chassis.drive(-0.375, -1);
+ *   		chassis.drive(0.375, 1);
+ *   	} else {
+ *   		chassis.drive(.275, 1);
+ *   		//chassis.drive(-.375, -1);
+ *   	}
+ *   	else {
+ *   		
+ *   		chassis.drive(0.0, 0.0);
+ *   	}
  * 
- * 4: front height - Victor motor controller 
- * 5: front tilt - Victor motor controller
- * 
+ *       
  */
 
 public class Robot extends IterativeRobot {
@@ -65,7 +114,7 @@ public class Robot extends IterativeRobot {
 	int session;
 	Image frame;
 
-	//Chassis Motor Controllers
+	//Drive Train Motor Controllers
 	Spark frontRight = new Spark(0);	// Right Front
 	Spark rearRight = new Spark(1);		// Right Rear
 	Spark frontLeft = new Spark(2);		// Left Front
@@ -80,7 +129,7 @@ public class Robot extends IterativeRobot {
 	 */
 
 	private AnalogGyro gyro;
-	double Kp = 0.000000000008;//delete 0 zero(s) to revert
+	double Kp = 0.000000000008;
 
 	public boolean isSwitchSet1() {
 
@@ -109,19 +158,14 @@ public class Robot extends IterativeRobot {
 		rightStick = new Joystick(0);
 		leftStick = new Joystick(1);
 
-		/*Currently all of these need to be inverted for it to work.*/
+		//Currently all of these need to be inverted for it to work
 		chassis.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
 		chassis.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
 		chassis.setInvertedMotor(RobotDrive.MotorType.kFrontRight, true);
 		chassis.setInvertedMotor(RobotDrive.MotorType.kRearRight, true);    	    	
 		chassis.setExpiration(0.1);
-		//vision
-		/*frame = NIVision.imaqCreateImage(NIVision.ImageType.IMAGE_RGB, 0);
-		// the camera name (ex "cam0") can be found through the roborio web interface
-		session = NIVision.IMAQdxOpenCamera("cam0",
-				NIVision.IMAQdxCameraControlMode.CameraControlModeController);
-		NIVision.IMAQdxConfigureGrab(session);
-		NIVision.IMAQdxGrab(session, frame, 1);*/                
+		
+		//vision                
 		CameraServer.getInstance().startAutomaticCapture("cam0");
 	}   
 
@@ -159,19 +203,18 @@ public class Robot extends IterativeRobot {
 		//autonomousRoughTerrain();
 		//autonomousStraight();
 		//autonomousPortCullis();
-		autonomousLowBar();
+		//autonomousLowBar();
+    	
     	
     	//Iffy, not used in practice/qualifier yet:
+		
     	//autonomousMoat();    	
     	//autonomousShovelTheFries();
 		
+    	
     	//Not even a little bit:
-		
+    	
 		//autonomousRamparts();
-		//autonomousTurn90Left();
-		//autonomousTurn90Right();
-		//autonomousTurn180Left();
-		//autonomousTurn180Right();
 	}
 
 	private void autonomousStraight() {
@@ -201,7 +244,6 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);		
 		if(X < 50 * n * .5) {//based on this, 50n = ~n second
 			arm.set(.3);
-			//chassis.drive(-0.25, angle*Kp);
 			X++;
 		} else if (Y < 50 * n * 3){
 			chassis.drive(-.35, angle*Kp);
@@ -221,10 +263,7 @@ public class Robot extends IterativeRobot {
 		if(X < 50 * n * 2) {//based on this, 50n = ~n second    		
 			chassis.drive(-0.4, angle*Kp);
 			X++;
-		}/* else if (Y < 50 * n * 2) {
-			chassis.drive(0.4, angle*Kp);
-			Y++;
-		} */
+		}
 	}
 
 	private void autonomousRoughTerrain() {
@@ -245,7 +284,6 @@ public class Robot extends IterativeRobot {
 
 		if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
 			chassis.drive(-0.25, angle*Kp);
-			//armTilt.set(-0.5);
 			X++;
     	}
     }
@@ -276,131 +314,7 @@ public class Robot extends IterativeRobot {
 			arm.set(-0.25);						//brings arm up
 			I++;
 		}
-		/*if(rightStick.getRawButton(3) && armUp != true) {
-			arm.set(-0.30);
-			initializeCounter2();			
-		} else if (armDown==true){
-			arm.set(0.0);
-			initializeCounter2();
-		}
 		
-
-		if(rightStick.getRawButton(5) && armDown != true){
-			arm.set(0.3);
-			initializeCounter1();
-		} else if (armUp==true){
-			arm.set(0.0);    
-			initializeCounter1();
-		}*/		 
-		
-	}
-    
-    private void autonomousTurn90Left() {
-    	double angle = gyro.getAngle();
-    	
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if( angle == 270) {
-    		
-    	}
-    	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
-    		chassis.tankDrive(0.15, -0.15);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    	else if(angle >= 0 && angle <=90){
-    		
-    		chassis.tankDrive(0.15, -0.15);
-    	}
-    	else if(angle > 90 && angle < 270) {
-    		
-    		chassis.tankDrive(-0.15, 0.15);
-    	}
-    	else {
-    		
-    		chassis.drive(0.0, 0.0);
-    	}
-    }
-    
-    private void autonomousTurn90Right() {
-    	
-    	
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	double angle = gyro.getAngle();
-    	gyro.reset();
-    	if(angle == 90) {
-    		
-    	}
-    	if(angle > 270 && angle <= 360 ) {//based on this, 50n = ~n second    		
-    		//chassis.tankDrive(-0.15, 0.15);
-    		chassis.drive(-0.375, 1);
-    		chassis.drive(0.375, -1);
-    	}    	
-    	SmartDashboard.putDouble("Angle", angle);
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if(X < 50 * n * 5) {//based on this, 50n = ~n second    		
-			chassis.drive(-0.25, 1);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    	if(X >= 50 * n * 5 && X <= 50 *n * 10)
-    	{
-    		chassis.drive(-0.25, -1);
-    		X++;
-    	}
-    	/**if(angle >= 85 && angle <= 95) {
-    		turnComplete = true;
-    	}
-    	else if(angle > 270 && angle <= 360 && turnComplete == false ) {//based on this, 50n = ~n second    		
-    		//chassis.tankDrive(-0.15, 0.15);
-    		//chassis.drive(-.375, 1);
-    		chassis.drive(-.275, -1);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    	else if(angle >= 0 && angle <85 && turnComplete == false){
-    		
-    		//chassis.tankDrive(-0.15, 0.15);
-    		chassis.drive(-0.375, 1);
-    		chassis.drive(0.375, -1);
-    		chassis.drive(-.275, -1);
-    		//chassis.drive(.375, -1);
-    	}
-    	else if(angle > 95 && angle < 270 && turnComplete == false) {
-    		
-    		//chassis.tankDrive(0.15, -0.15);
-    		chassis.drive(-0.375, -1);
-    		chassis.drive(0.375, 1);
-    	} else {
-    		chassis.drive(.275, 1);
-    		//chassis.drive(-.375, -1);
-    	}
-    	else {
-    		
-    		chassis.drive(0.0, 0.0);
-    	}*/
-    }
-    
-    private void autonomousTurn180() {
-    	
-    	double angle = gyro.getAngle();
-    	
-    	SmartDashboard.putNumber("Time - " + n + " Seconds", X);
-    	if( angle == 180) {
-    		
-    	}
-    	if(angle > 180 && angle <= 360 ) {//based on this, 50n = ~n second    		
-    		chassis.tankDrive(0.15, -0.15);
-			//armTilt.set(-0.5);
-			X++;
-    	}
-    	else if(angle >= 0 && angle < 180){
-    		
-    		chassis.tankDrive(-0.15, 0.15);
-    	}
-    	else {
-    		
-    		chassis.drive(0.0, 0.0);
-    	}
 	}
 
 	/**
@@ -416,7 +330,7 @@ public class Robot extends IterativeRobot {
 	 * @see edu.wpi.first.wpilibj.IterativeRobot#teleopPeriodic()
 	 * @param
 	 * @author Holmen Robotics
-	 * @version 4/28/2016
+	 * @version 4/30/2016
 	 *   
 	 */
 
