@@ -87,7 +87,8 @@ public class Robot extends IterativeRobot {
 	RobotDrive controlArm;
 	Joystick rightStick;// = new Joystick(0);
 	Joystick leftStick;// = new Joystick(1);
-
+	Joystick xbox;
+	
 	int n;
 	int X;
 	int Y;
@@ -101,6 +102,7 @@ public class Robot extends IterativeRobot {
 	boolean armUp;	
 	boolean armDown;
 	boolean autonomousTask1;
+	boolean xbox2 = false;
 	
 	DigitalInput limitSwitch1 = new DigitalInput(0);
 	DigitalInput limitSwitch2 = new DigitalInput(1);
@@ -151,13 +153,14 @@ public class Robot extends IterativeRobot {
 	}
 
 	public void robotInit() {
-
 		gyro = new AnalogGyro(1);
 		chassis = new RobotDrive(rearLeft,frontLeft,rearRight,frontRight);
-
+		if (xbox2 == false) {
 		rightStick = new Joystick(0);
 		leftStick = new Joystick(1);
-
+		} else if(xbox2 == true) {
+		xbox = new Joystick(0);
+		}
 		//Currently all of these need to be inverted for it to work
 		chassis.setInvertedMotor(RobotDrive.MotorType.kFrontLeft, true);
 		chassis.setInvertedMotor(RobotDrive.MotorType.kRearLeft, true);
@@ -202,7 +205,7 @@ public class Robot extends IterativeRobot {
     	
 		//autonomousRoughTerrain();
 		//autonomousStraight();
-		//autonomousPortCullis();
+		autonomousPortCullis();
 		//autonomousLowBar();
     	
     	
@@ -224,6 +227,7 @@ public class Robot extends IterativeRobot {
 		SmartDashboard.putNumber("Time - " + n + " Seconds", X);
 		if(X < 50 * n * 1.5) {//based on this, 50n = ~n second    		
 			chassis.drive(-0.4, angle*Kp);
+			
 			X++;
 		}
 	}
@@ -339,10 +343,25 @@ public class Robot extends IterativeRobot {
     	SmartDashboard.putDouble("Angle", angle);
 		armUp = isSwitchSet1();
 		armDown = isSwitchSet2();
-
+		if (xbox2 == false) {
 		chassis.arcadeDrive(rightStick, true);
-
-		if(rightStick.getRawButton(3) && armUp != true) {
+		if((rightStick.getRawButton(3)) && armUp != true) {
+			arm.set(-0.30);
+			initializeCounter2();			
+		} else if (armDown==true){
+			arm.set(0.0);
+			initializeCounter2();
+		}
+		if((rightStick.getRawButton(5)) && armDown != true){
+			arm.set(0.3);
+			initializeCounter1();
+		} else if (armUp==true){
+			arm.set(0.0);    
+			initializeCounter1();
+		}//////////////////////////////////////////////////////////
+		} else  {
+		chassis.arcadeDrive(xbox, true);
+		if((xbox.getRawButton(1)) && armUp != true) {
 			arm.set(-0.30);
 			initializeCounter2();			
 		} else if (armDown==true){
@@ -351,13 +370,16 @@ public class Robot extends IterativeRobot {
 		}
 		
 
-		if(rightStick.getRawButton(5) && armDown != true){
+		if((xbox.getRawButton(4)) && armDown != true){
 			arm.set(0.3);
 			initializeCounter1();
 		} else if (armUp==true){
 			arm.set(0.0);    
 			initializeCounter1();
-		}		 
+		}
+		}
+		
+				 
 	}
 
 	/**
